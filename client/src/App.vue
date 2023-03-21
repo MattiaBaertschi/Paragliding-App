@@ -1,6 +1,30 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
+import axios from 'axios';
+import { onMounted, reactive, ref} from 'vue';
+
+
+
+const fetchData = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/');
+      const jsonData = response.data;
+      console.log(jsonData);
+      return jsonData
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const jsonData = reactive({ data: [] })
+
+  onMounted(async () => {
+    jsonData.value = await fetchData()
+  })
+
 </script>
+// https://www.youtube.com/watch?time_continue=128&v=-BYZAO99UVA
+
 
 <template>
   <header class="h-12 bg-black flex justify-center items-center fixed w-full">
@@ -8,16 +32,15 @@ import HelloWorld from './components/HelloWorld.vue'
   </header>
 
   <div class="container mx-auto pt-16 px-4 sm:px-6 lg:px-8">
-    <!-- Your content here -->
-  
+    data: {{jsonData}}
+
     <div>
-      <a href="https://vitejs.dev" target="_blank">
-        <img src="/vite.svg" class="logo" alt="Vite logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
-    </div>
+    <h1>JSON Data from http://127.0.0.1:8000/</h1>
+    <ul>
+      <li v-for="(item, index) in jsonData" :key="index">{{ item }}</li>
+    </ul>
+  </div>
+   
   
   <HelloWorld msg="Vite + Vue" />
   </div>
