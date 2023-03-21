@@ -7,11 +7,12 @@ conn = psycopg2.connect("dbname=flugbuch user=postgres password=e3jf9sp_39")
 cur = conn.cursor()
 
 # Abfrage aufsführen
-cur.execute("SELECT (ST_AsText(polyline)) from flug where flug_id = 1")
+#cur.execute("SELECT (ST_AsText(polyline)) from flug where flug_id = 1")
+cur.execute("SELECT * from flug where flug_id = 1")
 
 # Abfrage Resultate erhalten
 records = cur.fetchall()
 
 
 
-print(records[0][0])
+print(records)
