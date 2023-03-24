@@ -5,6 +5,7 @@ import AppHome from "@/views/AppHome.vue"
 import FlightMap from "@/views/FlightMap.vue"
 import AppSearch from "@/views/AppSearch.vue"
 import FlightOverview from "@/views/FlightOverview.vue"
+import ViewFlight from "@/views/ViewFlight.vue"
 
 const routes = [
     {
@@ -36,6 +37,11 @@ const routes = [
         path: "/flights",
         name: "flights",
         component: FlightOverview
+    },
+    {
+        path: "/flights/view/:id",
+        name: "viewflights",
+        component: ViewFlight
     }
     
 ]
