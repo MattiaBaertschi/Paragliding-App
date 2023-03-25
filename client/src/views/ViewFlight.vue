@@ -18,11 +18,25 @@ const flight_id = "flug_" + id // read parameter id (it is reactive)
     }
   }
 
+  const fetchFlightData = async (id) => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/');
+        const jsonData = response.data;
+        console.log(id, jsonData.value)
+        const flightData = jsonData.value[id]
+        console.log("extracted flightdata:", flightData)
+        return flightData
+      } catch (err) {
+        console.error(err);
+    }
+  }
+
   const jsonData = reactive({ data: [] })
-  var currentFlight = {}
+  var currentFlight = reactive({ data: []})
 
   onMounted(async () => {
     jsonData.value = await fetchData()
+    //currentFlight = fetchFlightData[flight_id]
     currentFlight = jsonData.value[flight_id]
   })
   
@@ -31,8 +45,8 @@ const flight_id = "flug_" + id // read parameter id (it is reactive)
 
 <template>
     <div>
-      {{ currentFlight.landeplatz }}
-     {{jsonData.value}}
+     
+      {{jsonData.value}}
     <h1>Flug mit ID: {{ $route.params.id }}</h1>
       <div>
       <div class="bg-white rounded-lg shadow-md overflow-hidden my-4">
