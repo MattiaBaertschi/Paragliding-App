@@ -1,6 +1,10 @@
 # Imports for API
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+# Imports for Photo upload
+from flask import request
+from werkzeug.utils import secure_filename
+
 
 # Impot psycopg2 to connet with the Postgres DB
 import psycopg2
@@ -43,16 +47,30 @@ app.add_middleware(
 async def root():
     return records
 
-@app.get("/id")
+# User-Login
+@app.get("/login")
 async def user(user,pw):
-    cur.execute("SELECT benutzername, passwort, benutzer_id FROM benutzer WHERE benutzername = 'amba999'")
-    record = cur.fetchall()
-    print(record)
-    print(user)
-    return record
+    try:
+        cur.execute(f"SELECT benutzer_id, benutzername, passwort FROM benutzer WHERE benutzername = '{user}'")
+        rec = cur.fetchall()
+        
+        log = {
+                'id': f"{rec[0][0]}",
+                'username': f"{rec[0][1]}",
+                'passwort': f"{rec[0][2]}"
+                }
+        
+        if pw == log['passwort']:#log.password:
+            print(log['id'])  
+            return log
+        return "passwordwrong"
+    except:
+        return "usernotfound"
 
-@app.post("image")
-async def image_upload(
-    my_file: UploadFile(...)
-    ):
-    return "done"
+# Upload Photo
+@app.post('/upload_photo')
+def upload_photo():
+    photo = request.files['photo']
+    filename = secure_filename(photo.filename)
+    photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    return 'Photo uploaded successfully'
