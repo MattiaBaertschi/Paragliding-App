@@ -66,7 +66,7 @@
           /*
             Make the request to the POST /select-files URL
           */
-          axios.post( '/select-files',
+          axios.post( 'http://localhost:8000/upload_igc',
             formData,
             {
               headers: {
@@ -91,6 +91,7 @@
           for( var i = 0; i < uploadedFiles.length; i++ ){
             this.files.push( uploadedFiles[i] );
           }
+          console.log(uploadedFiles)
         },
         /*
           Removes a select file the user has uploaded

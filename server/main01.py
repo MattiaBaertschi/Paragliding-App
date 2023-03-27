@@ -1,14 +1,8 @@
-# Imports for API
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-# Imports for Photo upload
-from flask import request
-from werkzeug.utils import secure_filename
-
-
-# Impot psycopg2 to connet with the Postgres DB
+from pydantic import BaseModel
+import os
 import psycopg2
-
 
 # connect to the Database
 conn = psycopg2.connect("dbname=flugbuch user=postgres password=e3jf9sp_39")
@@ -28,7 +22,6 @@ print(records[0][2])
 print(polyline[0][0])
 #print(records)
 
-
 app = FastAPI()
 
 # Alow the Frontent to connet to the API
@@ -42,26 +35,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class User(BaseModel):
+    user: str
+    pw: str
 
 @app.get("/")
 async def root():
     return records
 
 # User-Login
-@app.get("/login")
-async def user(user,pw):
+@app.post("/login")
+async def login(user: User):
     try:
-        cur.execute(f"SELECT benutzer_id, benutzername, passwort FROM benutzer WHERE benutzername = '{user}'")
+        cur.execute(f"SELECT benutzer_id, benutzername, passwort FROM benutzer WHERE benutzername = '{user.user}'")
         rec = cur.fetchall()
-        
+
         log = {
-                'id': f"{rec[0][0]}",
-                'username': f"{rec[0][1]}",
-                'passwort': f"{rec[0][2]}"
-                }
-        
-        if pw == log['passwort']:#log.password:
-            print(log['id'])  
+            'id': f"{rec[0][0]}",
+            'username': f"{rec[0][1]}",
+            'passwort': f"{rec[0][2]}"
+        }
+
+        if user.pw == log['passwort']:#log.password:
+            print(log['id'])
             return log
         return "passwordwrong"
     except:
@@ -69,8 +65,17 @@ async def user(user,pw):
 
 # Upload Photo
 @app.post('/upload_photo')
-def upload_photo():
-    photo = request.files['photo']
-    filename = secure_filename(photo.filename)
-    photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+async def upload_photo(file: UploadFile = File(...)):
+    filename = file.filename
+    with open(os.path.join('./data/image', filename), 'wb') as buffer:
+        shutil.copyfileobj(file.file, buffer)
     return 'Photo uploaded successfully'
+
+
+# Upload IGC
+@app.post('/upload_igc')
+async def upload_igc(file: UploadFile = File(...)):
+    filename = file.filename
+    with open(os.path.join('./data/uploads', filename), 'wb') as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    return 'IGC file uploaded successfully'
