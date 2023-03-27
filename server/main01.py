@@ -1,8 +1,9 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+import shutil
 import os
 import psycopg2
+
 
 # connect to the Database
 conn = psycopg2.connect("dbname=flugbuch user=postgres password=e3jf9sp_39")
@@ -35,19 +36,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class User(BaseModel):
-    user: str
-    pw: str
 
 @app.get("/")
 async def root():
-    return records
+    return "hallo" #records
 
 # User-Login
 @app.post("/login")
-async def login(user: User):
+async def login(user, pw):
     try:
-        cur.execute(f"SELECT benutzer_id, benutzername, passwort FROM benutzer WHERE benutzername = '{user.user}'")
+        cur.execute(f"SELECT benutzer_id, benutzername, passwort FROM benutzer WHERE benutzername = '{user}'")
         rec = cur.fetchall()
 
         log = {
@@ -56,7 +54,7 @@ async def login(user: User):
             'passwort': f"{rec[0][2]}"
         }
 
-        if user.pw == log['passwort']:#log.password:
+        if pw == log['passwort']:#log.password:
             print(log['id'])
             return log
         return "passwordwrong"
@@ -76,6 +74,6 @@ async def upload_photo(file: UploadFile = File(...)):
 @app.post('/upload_igc')
 async def upload_igc(file: UploadFile = File(...)):
     filename = file.filename
-    with open(os.path.join('./data/uploads', filename), 'wb') as buffer:
+    with open(os.path.join('./data/igc', filename), 'wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
     return 'IGC file uploaded successfully'
