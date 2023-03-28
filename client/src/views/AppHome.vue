@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios';
 import { onMounted, reactive } from 'vue';
+import MapComponent from "@/components/MapComponent.vue"
 
 
 
@@ -20,6 +21,9 @@ const fetchData = async () => {
   onMounted(async () => {
     jsonData.value = await fetchData()
   })
+  var polyLine = []
+  polyLine = [[8.5,47],[8.6,47.1],[8.6,47.3],[8.8,47.2]]
+  console.log(typeof(polyLine), polyLine)
 </script>
 
 
@@ -32,7 +36,8 @@ const fetchData = async () => {
       <div v-for="(flight, index) in jsonData.value" :key="index">
       <div class="bg-white rounded-lg shadow-md overflow-hidden my-4">
       <div class="relative h-64">
-        <img src="https://placekitten.com/640/360" alt="Flugbild" class="w-full h-full object-cover">
+        <MapComponent :flightPath="flight.polyline" msg="hallo"/>
+        <!--<img src="https://placekitten.com/640/360" alt="Flugbild" class="w-full h-full object-cover">-->
         <div class="absolute top-2 left-2 px-4 py-1 bg-gray-900 text-white rounded-lg text-sm tracking-wider">{{ flight.temperatur }} | {{ flight.wind }}</div>
       </div>
       <div class="p-4">
