@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, ref } from 'vue'
+import { defineProps, onMounted, ref } from 'vue'
 
 defineProps({
   msg: String,
@@ -31,14 +31,19 @@ const calcMapCenter = (coordinates) => {
 
   return mapCenter
 }
+
+onMounted( () => {
+    console.log("hoit")
+  })
+
+
 </script>
 
 <template>
   <div class="w-full h-full object-cover bg-gray-200">
   <ol-map :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" :mouseWheelZoom="true" style="height:100%">
     
-  <ol-view ref="view" :center=calcMapCenter(flightPath) :rotation="rotation" :zoom="zoom" 
-  :projection="projection" />
+  <ol-view ref="view" :center=calcMapCenter(flightPath) :rotation="rotation" :zoom="zoom" :projection="projection" />
 
   <ol-tile-layer>
       <ol-source-osm />
