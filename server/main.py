@@ -16,42 +16,44 @@ app.add_middleware(
 startpage = '''
 {
 "flug_1": {
-	"firstname": "Mattia", /* aus Tabelle Benuzter */
-	"lastname": "Bärtschi", /* aus Tabelle Benuzter */
-	"comment": "es ischt ein huren schöner flug gesit", /* erste hundert zeichen */
+    "id": 1,
+	"firstname": "Mattia", 
+	"lastname": "Bärtschi",
+	"comment": "es ischt ein huren schoener flug gesit",
 	"flight_name": "MetschStand-Rotenbach",	
-	"flugzeit" : "01:24",
+	"flighttime" : "01:24",
 	"polyline": [
 		[8.6083, 46.9656],
 		[8.0795, 46.6716],
 		[9.8061, 46.5389],
 		[7.4482, 46.9368]
 	],
-	"takeof": "Biel Kinizie",
+	"takeoff": "Biel Kinizie",
 	"landing": "Ligerz",
 	"date": "04. Juni 2022",
 	"img_link": "./test1",
-	"wind": "15km/h", /* Null */
-	"temp": "23°C" /* Null */
+	"wind": "15km/h",
+	"temp": "23°C" 
     },
 "flug_3": {
-	"firstname": "Tim", /* aus Tabelle Benuzter */
-	"lastname": "feltenene", /* aus Tabelle Benuzter */
-	"comment": "es ischt ein huren schöner flug gesit", /* erste hundert zeichen */
+    "id": 2,
+	"firstname": "Tim", 
+	"lastname": "feltenene",
+	"comment": "es ischt ein huren schöner flug gesit",
 	"flight_name": "MetschStand-Rotenbach",	
-	"flugzeit" : "01:24",
+	"flighttime" : "01:24",
 	"polyline": [
-		[8.6083, 46.9656],
-		[8.0795, 46.6716],
-		[9.8061, 46.5389],
-		[7.4482, 46.9368]
-	],
-	"takeof": "Biel Kinizie",
+            [9.1796, 46.4131], 
+            [8.8816, 46.5667], 
+            [8.7739, 46.2768], 
+            [8.9566, 46.0081]
+        ],
+	"takeoff": "Biel Kinizie",
 	"landing": "Ligerz",
 	"date": "04. Juni 2022",
 	"img_link": "./test1",
-	"wind": "15km/h", /* Null */
-	"temp": "23°C" /* Null */
+	"wind": "15km/h",
+	"temp": "23°C"
     }
  }
 '''
@@ -64,7 +66,7 @@ flug_2: {
     "datum": "04. Juni 2022",
     "startplatz": "Biel Kinizie",
     "landeplatz": "Ligerz",
-    "flugzeit" : "01:24"
+    "flighttime" : "01:24"
     },
 flug_1: {
     "id": 1,
@@ -72,7 +74,7 @@ flug_1: {
     "datum": "04. Juni 2022",
     "startplatz": "Biel Kinizie",
     "landeplatz": "Ligerz",
-    "flugzeit" : "01:24"
+    "flighttime" : "01:24"
     }
 }
 '''
@@ -83,7 +85,7 @@ userprofile = '''
 "airtime_year": 21.5, /*in houers */
 "user_img_path": "./bliblablub",
 "username": "amba999", /*without spaces*/
-"firsname": "Mattia",
+"firstname": "Mattia",
 "lastname": "Bärtschi",
 "shv_nummer": "65465"
 }
@@ -95,25 +97,27 @@ flight_details = '''
 "flight_name": "MetschStand-Rotenbach",
 "alt": [1203,1203,1203,1203],
 "agl": [20,100,300,40],
-"time_stamps": ['09:23', '09:23', '09:23', '09:23'], 	
-"takeoftime": "09:23",
+"time_stamps": ["09:23", "09:23", "09:23", "09:23"], 	
+"takeofftime": "09:23",
 "landingtime": "15:11",
-"flugzeit" : "01:24",
+"flighttime" : "01:24",
 "user_id": 2,
+"firstname": "Mattia",
+"lastname": "Bärtschi",
 "polyline": [
 	[8.6083, 46.9656],
 	[8.0795, 46.6716],
 	[9.8061, 46.5389],
 	[7.4482, 46.9368]
     ],
-"takeof": "Biel Kinizie",
+"takeoff": "Biel Kinizie",
 "landing": "Ligerz",
 "biplace": true,
 "date": "04. Juni 2022",
 "glider": "Swing Mito",
 "img_link": "./test1",
-"wind": "15km/h", /* Null */
-"temp": "23°C" /* Null */
+"wind": "15km/h",
+"temp": "23°C"
  }
 '''
 

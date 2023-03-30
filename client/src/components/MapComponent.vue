@@ -2,7 +2,14 @@
 import { defineProps, onMounted, toRaw, ref } from 'vue'
 
 const props = defineProps({
-  flightPath: Array
+  flightPath: { 
+    type: Array,
+    default: [
+		[8.6, 46.9],
+		[8.7, 46.9],
+		[8.4, 46.4],
+		[8.7, 46.4]
+	]},
 })
 
 const view = ref()
@@ -43,29 +50,26 @@ const calcGeomExtent = (geometry) => {
   const max_long = Math.max(...longs);
   const min_long = Math.min(...longs);
 
-  // Format the results as specified
+  // Format the results as specified and add some padding
   const result = [
-    parseFloat(min_long.toFixed(14))-0.1,
-    parseFloat(min_lat.toFixed(14))-0.1,
-    parseFloat(max_long.toFixed(14))+0.1,
-    parseFloat(max_lat.toFixed(14))+0.1
+    parseFloat(min_long.toFixed(14))-0.01,
+    parseFloat(min_lat.toFixed(14))-0.01,
+    parseFloat(max_long.toFixed(14))+0.01,
+    parseFloat(max_lat.toFixed(14))+0.01
   ];
   console.log("mapExtent:", result);
   return(result)
 }
 
-
 onMounted( () => {   
         view.value.view.fit(calcGeomExtent(props.flightPath))    
   })
-
-//console.log(props.flightPath)
 
 </script>
 
 <template>
   <div class="w-full h-full object-cover bg-gray-200">
-  <ol-map ref="map" :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" :mouseWheelZoom="true" style="height:100%">
+  <ol-map ref="map" :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" :mouseWheelZoom="false" style="height:100%">
     
   <ol-view ref="view" :center=calcMapCenter(flightPath) :rotation="rotation" :zoom="zoom" :projection="projection" />
 
