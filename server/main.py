@@ -249,6 +249,9 @@ json_string = '''
 
 '''
 
+@app.get("/")
+async def root():
+    return json.loads(json_string)
 
 @app.get("/get_startpage")
 async def root():
