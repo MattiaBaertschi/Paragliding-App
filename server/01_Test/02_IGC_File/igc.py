@@ -1,10 +1,13 @@
 import fileinput
 import re
+from datetime import datetime
 
 
-f = open('./test.igc','r',encoding='utf-8')
+f = open('./01_Test/02_IGC_File/test.igc','r',encoding='utf-8')
 
 koord = []
+times = []
+altitude = []
 
 
 B_Pattern = re.compile((r"^B(\d{6})(\d{2})(\d{5})(N|S)(\d{3})(\d{5})(E|W)(A|V)([0-9-]{5})(\d{5})(.*)$"))
@@ -19,8 +22,22 @@ def record(match):
     palt = int(match[9])
     galt = int(match[10])
     rest = match[11]
-    koord.append([lon,lat])
 
+    # Convert string to datetime object
+    time_obj = datetime.strptime(str(time), '%H%M%S')
+
+    # Convert datetime object to desired format
+    time_formatted = time_obj.strftime('%H:%M')
+
+    # Print result
+    print(time_formatted)
+
+
+
+    print(validity)
+    koord.append([lon,lat])
+    times.append(time_formatted)
+    altitude.append(galt)
 
 
 for line in f:
@@ -43,9 +60,10 @@ for line in f:
         Gleitschirm = line[16:]
         print(Gleitschirm)
     
-#print(koord) koord ist eine Liste (Polylinie) mit allen Koordinatn
+print(koord) #koord ist eine Liste (Polylinie) mit allen Koordinatn
+print(times)
+print(altitude)
 
-
-
+print()
 
 f.close()

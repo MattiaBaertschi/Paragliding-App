@@ -13,6 +13,110 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+startpage = '''
+{
+"flug_1": {
+	"firstname": "Mattia", /* aus Tabelle Benuzter */
+	"lastname": "Bärtschi", /* aus Tabelle Benuzter */
+	"comment": "es ischt ein huren schöner flug gesit", /* erste hundert zeichen */
+	"flight_name": "MetschStand-Rotenbach",	
+	"flugzeit" : "01:24",
+	"polyline": [
+		[8.6083, 46.9656],
+		[8.0795, 46.6716],
+		[9.8061, 46.5389],
+		[7.4482, 46.9368]
+	],
+	"takeof": "Biel Kinizie",
+	"landing": "Ligerz",
+	"date": "04. Juni 2022",
+	"img_link": "./test1",
+	"wind": "15km/h", /* Null */
+	"temp": "23°C" /* Null */
+    },
+"flug_3": {
+	"firstname": "Tim", /* aus Tabelle Benuzter */
+	"lastname": "feltenene", /* aus Tabelle Benuzter */
+	"comment": "es ischt ein huren schöner flug gesit", /* erste hundert zeichen */
+	"flight_name": "MetschStand-Rotenbach",	
+	"flugzeit" : "01:24",
+	"polyline": [
+		[8.6083, 46.9656],
+		[8.0795, 46.6716],
+		[9.8061, 46.5389],
+		[7.4482, 46.9368]
+	],
+	"takeof": "Biel Kinizie",
+	"landing": "Ligerz",
+	"date": "04. Juni 2022",
+	"img_link": "./test1",
+	"wind": "15km/h", /* Null */
+	"temp": "23°C" /* Null */
+    }
+ }
+'''
+
+flights = '''
+{
+flug_2: {
+    "id": 1,
+    "flight_name": "MetschStand-Rotenbach",
+    "datum": "04. Juni 2022",
+    "startplatz": "Biel Kinizie",
+    "landeplatz": "Ligerz",
+    "flugzeit" : "01:24"
+    },
+flug_1: {
+    "id": 1,
+    "flight_name": "MetschStand-Rotenbach",
+    "datum": "04. Juni 2022",
+    "startplatz": "Biel Kinizie",
+    "landeplatz": "Ligerz",
+    "flugzeit" : "01:24"
+    }
+}
+'''
+userprofile = '''
+{
+"flight_count": 3,
+"airtime_total": 123.4, /*in houers */
+"airtime_year": 21.5, /*in houers */
+"user_img_path": "./bliblablub",
+"username": "amba999", /*without spaces*/
+"firsname": "Mattia",
+"lastname": "Bärtschi",
+"shv_nummer": "65465"
+}
+'''
+
+flight_details = '''
+{
+"id": 1,
+"flight_name": "MetschStand-Rotenbach",
+"alt": [1203,1203,1203,1203],
+"agl": [20,100,300,40],
+"time_stamps": ['09:23', '09:23', '09:23', '09:23'], 	
+"takeoftime": "09:23",
+"landingtime": "15:11",
+"flugzeit" : "01:24",
+"user_id": 2,
+"polyline": [
+	[8.6083, 46.9656],
+	[8.0795, 46.6716],
+	[9.8061, 46.5389],
+	[7.4482, 46.9368]
+    ],
+"takeof": "Biel Kinizie",
+"landing": "Ligerz",
+"biplace": true,
+"date": "04. Juni 2022",
+"glider": "Swing Mito",
+"img_link": "./test1",
+"wind": "15km/h", /* Null */
+"temp": "23°C" /* Null */
+ }
+'''
+
 json_string = '''
     {
     "flug_1": {
@@ -145,11 +249,25 @@ json_string = '''
 
 '''
 
-
 @app.get("/")
 async def root():
     return json.loads(json_string)
 
+@app.get("/get_startpage")
+async def root():
+    return json.loads(startpage)
+
+@app.get("/get_userprofile")
+async def root():
+    return json.loads(userprofile)
+
+@app.get("/get_flights")
+async def root():
+    return json.loads(flights)
+
+@app.get("/get_flight_details")
+async def root():
+    return json.loads(flight_details)
 
 @app.post("/uploadflight/")
 async def create_upload_file(file: UploadFile = File(...)):

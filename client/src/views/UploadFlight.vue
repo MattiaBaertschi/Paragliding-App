@@ -45,7 +45,11 @@ export default {
       Adds a file
     */
     addFile(){
-      this.$refs.file.click();
+      const fileInput =  this.$refs.file;
+      /*fileInput.accept = 'image/*'; // set accepted file types to images only
+      */
+      fileInput.multiple = false; // allow only one file to be selected
+      fileInput.click();
     },
     /*
       Submits file to the server
@@ -62,7 +66,7 @@ export default {
       /*
         Make the request to the POST /upload_igc URL
       */
-      axios.post( 'http://localhost:8000/upload_igc',
+      axios.post( 'http://localhost:8000/upload_photo',
         formData,
         {
           headers: {
