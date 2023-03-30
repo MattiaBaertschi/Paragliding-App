@@ -1,11 +1,11 @@
 <script setup>
-import { defineProps, onMounted, ref } from 'vue'
+import { defineProps, onMounted, toRaw, ref } from 'vue'
 
-defineProps({
-  msg: String,
-  flightPath: Array,
+const props = defineProps({
+  flightPath: Array
 })
 
+const view = ref()
 const center = ref([8.5, 47])
 const projection = ref('EPSG:4326')
 const zoom = ref(8)
@@ -14,6 +14,7 @@ const strokeWidth = ref(2)
 const strokeColor = ref('black')
 
 const calcMapCenter = (coordinates) => {
+
   let sumLongitudes = 0;
   let sumLatitudes = 0;
 
@@ -32,16 +33,39 @@ const calcMapCenter = (coordinates) => {
   return mapCenter
 }
 
-onMounted( () => {
-    console.log("hoit")
+const calcGeomExtent = (geometry) => {
+  // Find the highest and lowest latitude and longitude
+  const lats = geometry.map(coord => coord[1]);
+  const max_lat = Math.max(...lats);
+  const min_lat = Math.min(...lats);
+
+  const longs = geometry.map(coord => coord[0]);
+  const max_long = Math.max(...longs);
+  const min_long = Math.min(...longs);
+
+  // Format the results as specified
+  const result = [
+    parseFloat(min_long.toFixed(14))-0.1,
+    parseFloat(min_lat.toFixed(14))-0.1,
+    parseFloat(max_long.toFixed(14))+0.1,
+    parseFloat(max_lat.toFixed(14))+0.1
+  ];
+  console.log("mapExtent:", result);
+  return(result)
+}
+
+
+onMounted( () => {   
+        view.value.view.fit(calcGeomExtent(props.flightPath))    
   })
 
+//console.log(props.flightPath)
 
 </script>
 
 <template>
   <div class="w-full h-full object-cover bg-gray-200">
-  <ol-map :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" :mouseWheelZoom="true" style="height:100%">
+  <ol-map ref="map" :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" :mouseWheelZoom="true" style="height:100%">
     
   <ol-view ref="view" :center=calcMapCenter(flightPath) :rotation="rotation" :zoom="zoom" :projection="projection" />
 
