@@ -39,7 +39,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return "hallo" #records
+    return records
 
 # User-Login
 @app.post("/login")
@@ -64,16 +64,23 @@ async def login(user, pw):
 # Upload Photo
 @app.post('/upload_photo')
 async def upload_photo(file: UploadFile = File(...)):
-    filename = file.filename
-    with open(os.path.join('./data/image', filename), 'wb') as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    return 'Photo uploaded successfully'
+    allowedFiles = {"image/jpeg", "image/png", "imgage/gif","image/tiff", "image/bmp", "video/webm"}
+    if file.content_type in allowedFiles:
+        filename = file.filename
+        with open(os.path.join('./data/image', filename), 'wb') as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        return 'Photo uploaded successfully'
+    else:
+        return 'wrongfiletype'
 
 
 # Upload IGC
 @app.post('/upload_igc')
 async def upload_igc(file: UploadFile = File(...)):
-    filename = file.filename
-    with open(os.path.join('./data/igc', filename), 'wb') as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    return 'IGC file uploaded successfully'
+    name, extention = os.path.splitext(file.filename)
+    if extention == '.igc':
+        with open(os.path.join('./data/igc', file.filename), 'wb') as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        return 'IGC file uploaded successfully'
+    else:
+        return 'wrongfiletype'
