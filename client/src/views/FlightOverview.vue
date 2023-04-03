@@ -4,7 +4,7 @@ import { onMounted, reactive } from 'vue';
 
 const fetchData = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:8000/get_flight_details');
+      const response = await axios.get('http://127.0.0.1:8000/get_flights');
       const jsonData = response.data;
       console.log(jsonData)
       return jsonData

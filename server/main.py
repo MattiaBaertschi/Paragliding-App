@@ -35,8 +35,48 @@ startpage = '''
 	"wind": "15km/h",
 	"temp": "23°C" 
     },
-"flug_3": {
+"flug_2": {
     "id": 2,
+	"firstname": "Tim", 
+	"lastname": "feltenene",
+	"comment": "es ischt ein huren schöner flug gesit",
+	"flight_name": "MetschStand-Rotenbach",	
+	"flighttime" : "01:24",
+	"polyline": [
+            [9.1796, 46.4131], 
+            [8.8816, 46.5667], 
+            [8.7739, 46.2768], 
+            [8.9566, 46.0081]
+        ],
+	"takeoff": "Biel Kinizie",
+	"landing": "Ligerz",
+	"date": "04. Juni 2022",
+	"img_link": "./test1",
+	"wind": "15km/h",
+	"temp": "23°C"
+    },
+    "flug_3": {
+    "id": 3,
+	"firstname": "Tim", 
+	"lastname": "feltenene",
+	"comment": "es ischt ein huren schöner flug gesit",
+	"flight_name": "MetschStand-Rotenbach",	
+	"flighttime" : "01:24",
+	"polyline": [
+            [9.1796, 46.4131], 
+            [8.8816, 46.5667], 
+            [8.7739, 46.2768], 
+            [8.9566, 46.0081]
+        ],
+	"takeoff": "Biel Kinizie",
+	"landing": "Ligerz",
+	"date": "04. Juni 2022",
+	"img_link": "./test1",
+	"wind": "15km/h",
+	"temp": "23°C"
+    },
+    "flug_4": {
+    "id": 4,
 	"firstname": "Tim", 
 	"lastname": "feltenene",
 	"comment": "es ischt ein huren schöner flug gesit",
@@ -60,7 +100,7 @@ startpage = '''
 
 flights = '''
 {
-flug_2: {
+"flug_1": {
     "id": 1,
     "flight_name": "MetschStand-Rotenbach",
     "datum": "04. Juni 2022",
@@ -68,23 +108,23 @@ flug_2: {
     "landeplatz": "Ligerz",
     "flighttime" : "01:24"
     },
-flug_1: {
-    "id": 1,
+"flug_2": {
+    "id": 2,
     "flight_name": "MetschStand-Rotenbach",
     "datum": "04. Juni 2022",
-    "startplatz": "Biel Kinizie",
-    "landeplatz": "Ligerz",
-    "flighttime" : "01:24"
+    "startplatz": "Metsch",
+    "landeplatz": "Rothenbach",
+    "flighttime" : "00:10"
     }
 }
 '''
 userprofile = '''
 {
 "flight_count": 3,
-"airtime_total": 123.4, /*in houers */
-"airtime_year": 21.5, /*in houers */
+"airtime_total": 123.4,
+"airtime_year": 21.5,
 "user_img_path": "./bliblablub",
-"username": "amba999", /*without spaces*/
+"username": "amba999",
 "firstname": "Mattia",
 "lastname": "Bärtschi",
 "shv_nummer": "65465"

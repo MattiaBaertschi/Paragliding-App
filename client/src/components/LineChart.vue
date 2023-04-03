@@ -18,7 +18,7 @@ export default {
   name: 'LineChart',
   components: { Line },
   data() {
-    const dataSetfromProps = [{ data: this.data1 },{ data: this.data2 }];
+    const dataSetfromProps = [{ data: this.data1, label: 'Flughöhe', backgroundColor: '#f87979' },{ data: this.data2, label: 'Höhe über Grund', backgroundColor: '#29344B' }];
     return {
       chartData: {
         labels: this.dataLabel,

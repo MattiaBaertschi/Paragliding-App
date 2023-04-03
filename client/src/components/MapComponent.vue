@@ -1,5 +1,9 @@
 <script setup>
 import { defineProps, onMounted, toRaw, ref } from 'vue'
+import proj4 from 'proj4';
+import {register} from 'ol/proj/proj4.js';
+import {get as getProjection} from 'ol/proj.js';
+
 
 const props = defineProps({
   flightPath: { 
@@ -19,6 +23,14 @@ const zoom = ref(8)
 const rotation = ref(0)
 const strokeWidth = ref(2)
 const strokeColor = ref('black')
+
+//https://openlayers.org/doc/faq.html#how-do-i-change-the-projection-of-my-map-
+proj4.defs('EPSG:21781',
+  '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 ' +
+  '+x_0=600000 +y_0=200000 +ellps=bessel ' +
+  '+towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
+register(proj4);
+const swissProjection = getProjection('EPSG:21781');
 
 const calcMapCenter = (coordinates) => {
 
@@ -68,7 +80,7 @@ onMounted( () => {
 </script>
 
 <template>
-  <div class="w-full h-full object-cover bg-gray-200">
+  <div class="w-full h-full object-cover">
   <ol-map ref="map" :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" :mouseWheelZoom="false" style="height:100%">
     
   <ol-view ref="view" :center=calcMapCenter(flightPath) :rotation="rotation" :zoom="zoom" :projection="projection" />

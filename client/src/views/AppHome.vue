@@ -40,7 +40,7 @@ const fetchData = async () => {
               <div class="h-8 w-8 rounded-full bg-gray-400 flex-shrink-0 mr-2"></div>
               <div class="text-sm font-medium">Benutzername {{ flight.benutzer_id }}</div>
             </div>
-            <div class="text-lg font-semibold mb-2">Titel des Fluges</div>
+            <div class="text-lg font-semibold mb-2">{{flight.flight_name}}</div>
             <div class="text-gray-700 mb-2">
               <div>Startplatz: {{ flight.takeoff }}</div>
               <div>Landeplatz: {{ flight.landing }}</div>

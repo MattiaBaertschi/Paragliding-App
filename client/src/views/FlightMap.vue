@@ -21,7 +21,14 @@ defineProps({
 </script>
 
 <template>
-  <ol-map :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" style="height:400px">
+  <div class="fixed bottom-11 z-10 left-0 right-0 bg-dark px-4 py-4 bg-dark text-white flex center">
+    <button class="px-4 mx-2 border-2 rounded-full">Alle</button>
+  <button class="px-4 mx-2 border-2 rounded-full">Start</button>
+  <button class="px-4 mx-2 border-2 rounded-full">Landung</button>
+  
+</div>
+
+  <ol-map :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" style="height:100vh;" class="-m-4 w-100vw">
   
   <ol-view ref="view" :center="center" :rotation="rotation" :zoom="zoom" 
   :projection="projection" />
