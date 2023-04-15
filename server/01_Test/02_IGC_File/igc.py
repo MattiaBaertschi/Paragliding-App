@@ -1,9 +1,12 @@
 import fileinput
 import re
 from datetime import datetime
+import transform
+import rasterio
+import numpy as np
+from rasterio.crs import CRS
 
-
-f = open('./01_Test/02_IGC_File/test.igc','r',encoding='utf-8')
+f = open('./01_Test/02_IGC_File/2023-03-03-XCT-PAE-01.igc','r',encoding='utf-8')
 
 koord = []
 times = []
@@ -29,12 +32,7 @@ def record(match):
     # Convert datetime object to desired format
     time_formatted = time_obj.strftime('%H:%M')
 
-    # Print result
-    print(time_formatted)
 
-
-
-    print(validity)
     koord.append([lon,lat])
     times.append(time_formatted)
     altitude.append(galt)
@@ -59,11 +57,43 @@ for line in f:
     if line[0:16] == 'HFGTYGLIDERTYPE:':
         Gleitschirm = line[16:]
         print(Gleitschirm)
-    
-print(koord) #koord ist eine Liste (Polylinie) mit allen Koordinatn
-print(times)
-print(altitude)
 
-print()
+
+    
+#print(f'Polyline = {koord}') #koord ist eine Liste (Polylinie) mit allen Koordinatn
+#print(times)
+#print(altitude)
+
+polyline_lv95 = transform.wgstolv95(koord)
+
+print(polyline_lv95[0])
+
+polyline = polyline_lv95
+
+hights = []
+
+with rasterio.open("C:/FHNW/4_Semester/4230_Geoinformatik_Raumanalyse_I/Paragliding_App_offline/01_Höhenprofil/01_SOURCE/test.tif") as dataset:
+
+    #dataset.crs = CRS.from_epsg(2056)
+
+    array = dataset.read(1)
+
+    print(array)
+
+    # for i in polyline:
+    #     x = i[0]
+    #     y = i[1]
+
+    #     # Konvertieren Sie geografische Koordinaten in Pixelkoordinaten
+    #     row, col = dataset.index(x, y)
+        
+    #     # Lese den ersten Band des Rasters aus und gib den Pixelwert an der berechneten Pixelposition aus
+    #     band = dataset.read(1)
+    #     pixel_value = band[row, col]
+        
+    #     # Gib den Pixelwert aus
+    #     hights.append(pixel_value)
+
+print(hights)
 
 f.close()

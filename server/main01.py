@@ -62,7 +62,7 @@ async def login(user, pw):
         return "usernotfound"
 
 # Upload Photo
-@app.post('/upload_photo')
+@app.post('/upload_image')
 async def upload_photo(file: UploadFile = File(...)):
     allowedFiles = {"image/jpeg", "image/png", "imgage/gif","image/tiff", "image/bmp", "video/webm"}
     if file.content_type in allowedFiles:
