@@ -1,7 +1,14 @@
 <script setup>
 import { ref, inject } from 'vue'
-const center = ref([8.5, 47])
-  const projection = ref('EPSG:4326')
+import proj4 from 'proj4';
+import { register } from 'ol/proj/proj4';
+
+proj4.defs('EPSG:2056', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs');
+register(proj4);
+
+  
+  const projection = ref('EPSG:2056')
+  const center = ref([2600000, 1200000]);
   const zoom = ref(8)
   const rotation = ref(0)
   const strokeWidth = ref(2)
@@ -48,7 +55,7 @@ defineProps({
   <ol-vector-layer>
     <ol-source-vector>
         <ol-feature>
-            <ol-geom-line-string :coordinates="[[8.5,47],[8.6,47.1],[8.6,47.3],[8.8,47.2]]"></ol-geom-line-string>
+            <!--<ol-geom-line-string :coordinates="[[8.5,47],[8.6,47.1],[8.6,47.3],[8.8,47.2]]"></ol-geom-line-string>-->
             <ol-style>
                     <ol-style-stroke :color="strokeColor" :width="strokeWidth"></ol-style-stroke>          
             </ol-style>
