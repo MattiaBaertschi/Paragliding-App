@@ -2,6 +2,8 @@
 import axios from 'axios';
 import { onMounted, reactive } from 'vue';
 import MapComponent from "@/components/MapComponent.vue"
+import CardComponent from "@/components/CardComponent.vue"
+
 
 const jsonData = reactive({ data: [] })
 
@@ -27,30 +29,7 @@ const fetchData = async () => {
     <div>
     <!--<h1>{{jsonData.value}}</h1>-->
       <div v-for="(flight, index) in jsonData.value" :key="index">
-        <RouterLink :to="`flights/view/${ flight.id }`">
-          <div class="bg-white rounded-lg shadow-md overflow-hidden my-8">
-          <div class="relative h-64">
-            <MapComponent :flightPath="flight.polyline"/>
-            <!--<img src="https://placekitten.com/640/360" alt="Flugbild" class="w-full h-full object-cover">-->
-            <div class="absolute top-2 left-2 px-4 py-1 bg-gray-900 text-white rounded-lg text-sm tracking-wider">{{ flight.temp }} | {{ flight.wind }}</div>
-          </div>
-          <div class="p-4">
-            <div class="text-sm text-gray-600 mb-2">{{ flight.date }}</div>
-            <div class="flex items-center mb-2">
-              <div class="h-8 w-8 rounded-full bg-gray-400 flex-shrink-0 mr-2"></div>
-              <div class="text-sm font-medium">Benutzername {{ flight.benutzer_id }}</div>
-            </div>
-            <div class="text-lg font-semibold mb-2">{{flight.flight_name}}</div>
-            <div class="text-gray-700 mb-2">
-              <div>Startplatz: {{ flight.takeoff }}</div>
-              <div>Landeplatz: {{ flight.landing }}</div>
-              <div>Flugdauer: {{ flight.flighttime }}</div>
-              <div>{{ flight.comment }}</div>
-            </div>
-            <a class="text-blue-500">Mehr lesen</a>
-          </div>
-        </div>
-      </RouterLink>
+        <CardComponent  :flight="flight"/> 
     </div>
   </div>
 
