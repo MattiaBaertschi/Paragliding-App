@@ -22,12 +22,11 @@ startpage = '''
 	"comment": "es ischt ein huren schoener flug gesit",
 	"flight_name": "MetschStand-Rotenbach",	
 	"flighttime" : "01:24",
-	"polyline": [
-		[8.6083, 46.9656],
-		[8.0795, 46.6716],
-		[9.8061, 46.5389],
-		[7.4482, 46.9368]
-	],
+	"polyline": [[2600000, 1200000],
+    [2625000, 1175000],
+    [2675000, 1150000],
+    [2700000, 1175000],
+    [2650000, 1225000]],
 	"takeoff": "Biel Kinizie",
 	"landing": "Ligerz",
 	"date": "04. Juni 2022",

@@ -26,20 +26,15 @@
 
 
     <div class="p-4">
-    <div class="text-sm text-gray-600 mb-2">{{ flight.date }}</div>
-    <div class="flex items-center mb-2">
-      <div class="h-8 w-8 rounded-full bg-gray-400 flex-shrink-0 mr-2"></div>
-      <div class="text-sm font-medium">Benutzername {{ flight.benutzer_id }}</div>
-    </div>
+    <div class="text-sm text-gray-600 mb-2">{{ flight.date }} | @{{ flight.benutzer_id }}userhandle</div>
     <div class="text-lg font-semibold mb-2">{{flight.flight_name}}</div>
     <div class="text-gray-700 mb-2">
-      <div>Startplatz: {{ flight.takeoff }}</div>
-      <div>Landeplatz: {{ flight.landing }}</div>
+      <div>{{ flight.takeoff }} -> {{ flight.landing }}</div>
       <div>Flugdauer: {{ flight.flighttime }}</div>
       <div>{{ flight.comment }}</div>
     </div>
     <RouterLink :to="`flights/view/${ flight.id }`">
-    <a class="text-dark font-bold underline-offset-4 underline decoration-2">Mehr lesen</a>
+    <a class="text-dark font-bold underline-offset-3 underline decoration-2">Flug ansehen</a>
     </RouterLink>
   </div>
   </div>
