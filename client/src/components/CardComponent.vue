@@ -52,7 +52,7 @@ const props = defineProps({
 
 const images = [
   "https://placekitten.com/640/360",
-  "https://placekitten.com/640/350",
+  "https://placekitten.com/550/350",
   "https://placekitten.com/640/320",
 ];
 

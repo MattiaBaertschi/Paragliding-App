@@ -3,7 +3,7 @@
     <div class="text-2xl mb-4">Suche nach <select v-model="searchType">
         <option value="all">Flügen & Buddys</option>
         <option value="flights">Flügen</option>
-        <option value="users">Benutzern</option>
+        <option value="users">Buddys</option>
       </select>
       <span  v-if="searchType === 'all' || searchType === 'flights'">
       von
@@ -33,7 +33,7 @@
     </div>
 
     <div v-if="searchType === 'all' || searchType === 'users'">
-      <h3 class="text-base font-bold uppercase tracking-widest mt-8">Benutzer:</h3>
+      <h3 class="text-base font-bold uppercase tracking-widest mt-8">Buddys:</h3>
       <ul>
         <li v-for="user in filteredUsers" :key="user.id">
           <UserCard :user="user" />
