@@ -5,17 +5,27 @@ import transform
 import rasterio
 import numpy as np
 from rasterio.crs import CRS
+import requests
+import csv
+from shapely.geometry import LineString
+
 
 f = open('./01_Test/02_IGC_File/2023-03-03-XCT-PAE-01.igc','r',encoding='utf-8')
+#f = open('./01_Test/02_IGC_File/test.igc','r',encoding='utf-8')
+
 
 koord = []
 times = []
 altitude = []
+index = []
+testkoord = []
 
+count = 0
 
 B_Pattern = re.compile((r"^B(\d{6})(\d{2})(\d{5})(N|S)(\d{3})(\d{5})(E|W)(A|V)([0-9-]{5})(\d{5})(.*)$"))
 
 def record(match):
+    global count
     time = int(match[1])
     lat = int(match[2]) + (int(match[3])/60000)
     lon = int(match[5]) + (int(match[6])/60000)
@@ -25,6 +35,7 @@ def record(match):
     palt = int(match[9])
     galt = int(match[10])
     rest = match[11]
+    count += 1
 
     # Convert string to datetime object
     time_obj = datetime.strptime(str(time), '%H%M%S')
@@ -33,9 +44,11 @@ def record(match):
     time_formatted = time_obj.strftime('%H:%M')
 
 
-    koord.append([lon,lat])
-    times.append(time_formatted)
+    koord.append([round(lon,6),round(lat,6)])
+    times.append(time)
     altitude.append(galt)
+    index.append(count)
+    testkoord.append([round(lat,6),round(lon,6)])
 
 
 for line in f:
@@ -48,15 +61,46 @@ for line in f:
             #PROGRAMM SHOLD TERMINATE HERE AND GIVE AN ERROR
         else:
             record(matches)
-    if line[0:10] == 'HOSITSite:':
-        Startplatz = line[10:]
-        print(Startplatz)
+    if line[18:25] == 'TAKEOFF':
+        takeoff = line[26:]
+        print(takeoff)
+    if line[18:25] == 'LANDING':
+        landing = line[26:]
+        print(landing)
     if line[0:19] == 'HFPLTPILOTINCHARGE:':
-        Pilot = line[19:]
-        print(Pilot)
+        pilot = line[19:]
+        print(pilot)
     if line[0:16] == 'HFGTYGLIDERTYPE:':
-        Gleitschirm = line[16:]
-        print(Gleitschirm)
+        glider = line[16:]
+        print(glider)
+
+f.close()
+
+koord_lv95 = transform.wgstolv95(koord)
+koord_str = ""
+reduced_altitude = []
+lon = []
+lat = []
+e = []
+n = []
+reduced_times = []
+reduced_index = []
+
+
+for i in range(0,len(koord),20):
+    koord_str = koord_str + str(koord[i][1]) + "," + str(koord[i][0]) + ","
+    reduced_altitude.append(altitude[i])
+    lon.append(koord[i][0])
+    lat.append(koord[i][1])
+    e.append(koord_lv95[i][0])
+    n.append(koord_lv95[i][1])
+    reduced_times.append(times[i])
+    reduced_index.append(index[i])
+    
+    
+
+
+koord_str = koord_str.rstrip(",")
 
 
     
@@ -64,36 +108,56 @@ for line in f:
 #print(times)
 #print(altitude)
 
-polyline_lv95 = transform.wgstolv95(koord)
+# polyline_lv95 = transform.wgstolv95(koord)
 
-print(polyline_lv95[0])
 
-polyline = polyline_lv95
 
-hights = []
+url = "https://api.airmap.com/elevation/v1/ele?points=" + koord_str
+response = requests.get(url)
 
-with rasterio.open("C:/FHNW/4_Semester/4230_Geoinformatik_Raumanalyse_I/Paragliding_App_offline/01_Höhenprofil/01_SOURCE/test.tif") as dataset:
+if response.status_code == 200:
+    data = response.json()
+    #print(data['data'])
 
-    #dataset.crs = CRS.from_epsg(2056)
+else:
+    print("error")
 
-    array = dataset.read(1)
 
-    print(array)
 
-    # for i in polyline:
-    #     x = i[0]
-    #     y = i[1]
+agl = []
+for i in range(0,len(reduced_altitude)):
+    agl.append(reduced_altitude[i]-data['data'][i])
 
-    #     # Konvertieren Sie geografische Koordinaten in Pixelkoordinaten
-    #     row, col = dataset.index(x, y)
-        
-    #     # Lese den ersten Band des Rasters aus und gib den Pixelwert an der berechneten Pixelposition aus
-    #     band = dataset.read(1)
-    #     pixel_value = band[row, col]
-        
-    #     # Gib den Pixelwert aus
-    #     hights.append(pixel_value)
 
-print(hights)
+arr = np.asarray([reduced_altitude,data['data'],agl,lon,lat,e,n,reduced_index,reduced_times])
+arr = arr.T
 
-f.close()
+headings = ['Hight_Glider','Terrain_API','AGL','lon','lat','E','N','index','timestamp']
+
+
+np.savetxt('./01_Test/02_IGC_File/sample.csv', arr, fmt='%d,%d,%d,%.6f,%.6f,%.3f,%.3f,%d,%d', delimiter=",", encoding='utf-8', header=','.join(headings))
+
+line = LineString(testkoord)
+
+line = line.simplify(0.005, preserve_topology=False)
+
+
+coord_list = list(line.coords)
+
+
+# convert the coordinate pairs to a list of lists
+point_list = [[x, y] for x, y in coord_list]
+
+
+line = np.hstack((np.arange(len(line.coords)).reshape(-1, 1), np.array(line.coords)))
+print(line)
+
+np.savetxt('./01_Test/02_IGC_File/simplifyed.csv', line, fmt='%d,%.6f,%.6f', delimiter=",", encoding='utf-8', header='index,lon,lat')
+
+
+
+# with open("./01_Test/02_IGC_File/linestirng.txt","w") as file:
+#    file.write(str(point_list))
+
+
+

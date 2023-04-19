@@ -66,7 +66,7 @@ export default {
       /*
         Make the request to the POST /upload_igc URL
       */
-      axios.post( 'http://localhost:8000/upload_photo',
+      axios.post( 'http://localhost:8000/upload_igc',
         formData,
         {
           headers: {
