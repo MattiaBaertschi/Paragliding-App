@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios';
 import { onMounted, reactive } from 'vue';
+import FlightCard from "@/components/FlightCard.vue"
 
 const fetchData = async () => {
     try {
@@ -35,16 +36,7 @@ const fetchData = async () => {
 
       <div v-for="(flight, index) in jsonData.value" :key="index">
       <RouterLink :to="`flights/view/${ flight.id }`">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden my-4">
-          <div class="p-4">
-            <div class="text-sm text-gray-600">{{ flight.datum }}</div>
-            <div class="text-lg font-semibold mt-1">{{flight.id}}. Flug</div>
-            <div class="text-gray-700 mb-2">
-              <div>{{ flight.startplatz }} | {{ flight.landeplatz }}</div>
-              <div>Flugdauer:{{ flight.flighttime }}</div>
-            </div>
-          </div>
-        </div>
+        <FlightCard :flight="flight" />
       </RouterLink>
     </div>
   </div>

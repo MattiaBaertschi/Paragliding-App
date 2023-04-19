@@ -6,8 +6,14 @@ import FlightMap from "@/views/FlightMap.vue"
 import AppSearch from "@/views/AppSearch.vue"
 import FlightOverview from "@/views/FlightOverview.vue"
 import ViewFlight from "@/views/ViewFlight.vue"
+import LoadingScreen from "@/views/LoadingScreen.vue"
 
 const routes = [
+    {
+        path: "/",
+        name: "Cloudy",
+        component: LoadingScreen
+    },
     {
         path: "/home",
         name: "home",
