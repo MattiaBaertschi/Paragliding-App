@@ -43,9 +43,9 @@
     <div>
         <div class="flex items-center justify-between mt-8">
             <div class="flex flex-col">
-                <button @click="chartTimeFrame = 'all';updateDataLabel()" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full">Alle</button>
-                <button @click="chartTimeFrame = 'year';updateDataLabel()"  class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full">Jahr</button>
-                <button @click="chartTimeFrame = 'month';updateDataLabel()" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full">Monat</button>
+                <button @click="setChartTimeFrame('all')" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full">Alle</button>
+                <button @click="setChartTimeFrame('year')"  class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full">Jahr</button>
+                <button @click="setChartTimeFrame('month')" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full">Monat</button>
                 </div>
             <div class="text-center">
                 <div class="text-3xl font-bold mb-2">4 Flüge</div>
@@ -71,67 +71,82 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue"
-import UserLineChart from '@/components/UserLineChart.vue';
-console.log("jitzigig zit", Date.now())
-const chartTimeFrame = ref("all")
-const displayChartType = ref(0)
+import { ref, computed, reactive } from "vue";
+import UserLineChart from "@/components/UserLineChart.vue";
 
-const dataLabel = [1681759873514, 1668654883620, 1668523871052, 1668476454296, 1668362147198, 1668287726579, 1668213209281, 1668058692034, 1667994224757, 1667929871418]
-const data2 = [1305, 1207, 1209, 1207, 1205, 1203, 1205, 1207, 1210, 1212]
-const data1 = [1012, 1014, 1008, 1013, 1011, 1011, 1004, 1014, 1004, 1009]
 
-const flightStats = {
-    labels: ["1","2","3","4","5"],
-    datasets: [{
-    data: [1,2,3,4,5],
-    label: 'Flughöhe',
-    backgroundColor: '#f87979'
-    },]};
 
-const timePerFlightStats = {
-    labels: ["1","2","3","4","5"],
-    datasets: [{
-    data: [1.3,2.5,1.1,0.3,1.8],
-    label: '⌀ Flugzeit per Flug',
-    backgroundColor: '#f87979'
-    },]};
+const chartTimeFrame = ref("all");
+const displayChartType = ref(0);
 
-const chartOptions = {responsive: true}
+function setChartTimeFrame(value) {
+  chartTimeFrame.value = value
+  console.log("^^", chartTimeFrame.value)
+  computedDataLabel.value = filterDataLabel(dataLabel, chartTimeFrame.value)
+  console.log(computedDataLabel.value)
+  console.log(chartData)
 
-var computedDataLabel = ref(computed(() => {
-    console.log("itz grad", dataLabel, chartTimeFrame.value)
-  return filterDataLabel(dataLabel, chartTimeFrame.value);
-}));
-
-function updateDataLabel(){
-    computedDataLabel = filterDataLabel(dataLabel, chartTimeFrame.value);
 }
 
-console.log(computedDataLabel)
-function tiger(){
-    console.log(chartTimeFrame.value, computedDataLabel)
-}
+const dataLabel = [
+  1681759873514,
+  1668654883620,
+  1668523871052,
+  1668476454296,
+  1668362147198,
+  1668287726579,
+  1668213209281,
+  1668058692034,
+  1667994224757,
+  1667929871418,
+];
+const data2 = [1305, 1207, 1209, 1207, 1205, 1203, 1205, 1207, 1210, 1212];
+const data1 = [1012, 1014, 1008, 1013, 1011, 1011, 1004, 1014, 1004, 1009];
+
+const flightStats = reactive({
+  labels: ["1", "2", "3", "4", "5"],
+  datasets: [
+    {
+      data: [1, 2, 3, 4, 5],
+      label: "Flughöhe",
+      backgroundColor: "#f87979",
+    },
+  ],
+});
+
+const timePerFlightStats = reactive({
+  labels: ["1", "2", "3", "4", "5"],
+  datasets: [
+    {
+      data: [1.3, 2.5, 1.1, 0.3, 1.8],
+      label: "⌀ Flugzeit per Flug",
+      backgroundColor: "#f87979",
+    },
+  ],
+});
+
+
+
+const computedDataLabel = ref(filterDataLabel(dataLabel, chartTimeFrame.value))
+
+
+const chartOptions = { responsive: true };
 
 function filterDataLabel(dataLabel, chartTimeFrame) {
-    console.log("goperdami")
-      const now = Date.now();
-      const oneYear = 365 * 24 * 60 * 60 * 1000; // Anzahl der Millisekunden in einem Jahr
-      const oneMonth = 30 * 24 * 60 * 60 * 1000; // Anzahl der Millisekunden in einem Monat (angenommen 30 Tage)
-        console.log(chartTimeFrame)
-      if (chartTimeFrame === "all") {
-        console.log("all =)", dataLabel)
-        return dataLabel;
-      } else if (chartTimeFrame === "year") {
-        console.log("year", dataLabel.filter((timestamp) => now - timestamp <= oneYear))
-        return dataLabel.filter((timestamp) => now - timestamp <= oneYear);
-      } else if (chartTimeFrame === "month") {
-        console.log("month", dataLabel.filter((timestamp) => now - timestamp <= oneMonth))
-        return dataLabel.filter((timestamp) => now - timestamp <= oneMonth);
-      } else {
-        return [];
-      }
-    }
+  const now = Date.now();
+  const oneYear = 365 * 24 * 60 * 60 * 1000; // Anzahl der Millisekunden in einem Jahr
+  const oneMonth = 30 * 24 * 60 * 60 * 1000; // Anzahl der Millisekunden in einem Monat (angenommen 30 Tage)
+
+  if (chartTimeFrame === "all") {
+    return dataLabel;
+  } else if (chartTimeFrame === "year") {
+    return dataLabel.filter((timestamp) => now - timestamp <= oneYear);
+  } else if (chartTimeFrame === "month") {
+    return dataLabel.filter((timestamp) => now - timestamp <= oneMonth);
+  } else {
+    return [];
+  }
+}
 
 const chartData = {
     labels: computedDataLabel.value,
@@ -144,5 +159,7 @@ const chartData = {
     label: 'Höhe über Grund',
     backgroundColor: '#29344B'
     }]};
+
+    
 
 </script>
