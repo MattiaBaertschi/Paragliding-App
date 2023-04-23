@@ -1,5 +1,4 @@
 <template>
-    
     <div class="flex flex-col items-center">
     <img src="https://www.shutterstock.com/image-vector/cheerful-gray-cat-enjoys-paragliding-260nw-1981432805.jpg" alt="Profilbild" class="w-32 h-32 rounded-full mb-4">
 
@@ -43,68 +42,61 @@
     <div>
         <div class="flex items-center justify-between mt-8">
             <div class="flex flex-col">
-                <button @click="setChartTimeFrame('all')" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full">Alle</button>
-                <button @click="setChartTimeFrame('year')"  class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full">Jahr</button>
-                <button @click="setChartTimeFrame('month')" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full">Monat</button>
+                <button @click="setChartTimeFrame('all'); updateKey += 1" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': chartTimeFrame === 'all'}">Alle</button>
+                <button @click="setChartTimeFrame('year'); updateKey += 1"  class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': chartTimeFrame === 'year'}">Jahr</button>
+                <button @click="setChartTimeFrame('month'); updateKey += 1" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': chartTimeFrame === 'month'}">Monat</button>
                 </div>
             <div class="text-center">
                 <div class="text-3xl font-bold mb-2">4 Flüge</div>
                 <div class="text-sm">August 2023</div>
             </div>
             <div class="flex flex-col">
-                <button @click="displayChartType = 0" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full">Flüge</button>
-                <button @click="displayChartType = 1" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full">Zeit</button>
-                <button @click="displayChartType = 2" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full">⌀ Zeit/Flug</button>
+                <button @click="displayChartType = 0" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': displayChartType === 0 }">Flüge</button>
+                <button @click="displayChartType = 1" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': displayChartType === 1 }">Zeit</button>
+                <button @click="displayChartType = 2" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': displayChartType === 2 }">⌀ Zeit/Flug</button>
             </div>
         </div>
         <div v-if="displayChartType == 0">
-            <UserLineChart :chartOptions="chartOptions" :chartData="chartData" />
+            <UserLineChart :chartOptions="chartOptions" :chartData="chartData" :key="updateKey"/>
         </div>
         <div v-if="displayChartType == 1">
-            <UserLineChart :chartOptions="chartOptions" :chartData="flightStats" />
+            <UserLineChart :chartOptions="chartOptions" :chartData="flightStats" :key="updateKey"/>
         </div>
         <div v-if="displayChartType == 2">
-            <UserLineChart :chartOptions="chartOptions" :chartData="timePerFlightStats" />
+            <UserLineChart :chartOptions="chartOptions" :chartData="timePerFlightStats" :key="updateKey"/>
         </div>
     </div>
-    <button @click="tiger()">Tiger Chnopf</button>
+    <div class="my-64">
+      <p class="mb-4">Cloudy übernimmt keine Gewähr für die Korrektheit der dargestelltetn Daten.</p>
+      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full">Alle Daten exportieren</button>
+      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full">Alle Daten Löschen</button>
+    </div>
 </template>
 
 <script setup>
-import { ref, computed, reactive } from "vue";
+import { ref, reactive } from "vue";
 import UserLineChart from "@/components/UserLineChart.vue";
 
-
-
+const updateKey = ref(0)
 const chartTimeFrame = ref("all");
 const displayChartType = ref(0);
 
 function setChartTimeFrame(value) {
+  chartData.labels = filterDataLabel(dataLabel, value)
+  flightStats.labels = filterDataLabel(datalabel1, value)
+  timePerFlightStats.labels = filterDataLabel(datalabel2, value)
+  // Wichtig damit Button als aktiv markiert wird
   chartTimeFrame.value = value
-  console.log("^^", chartTimeFrame.value)
-  computedDataLabel.value = filterDataLabel(dataLabel, chartTimeFrame.value)
-  console.log(computedDataLabel.value)
-  console.log(chartData)
-
 }
 
-const dataLabel = [
-  1681759873514,
-  1668654883620,
-  1668523871052,
-  1668476454296,
-  1668362147198,
-  1668287726579,
-  1668213209281,
-  1668058692034,
-  1667994224757,
-  1667929871418,
-];
+const dataLabel = [1681759873514, 1688654883620, 1688523871052, 1668476454296, 1668362147198, 1668287726579, 1668213209281, 1468058692034, 1467994224757, 1467929871418];
+const datalabel1 = [1681759873514, 1688654883620, 1688523871052, 1668476454296, 1668362147198]
+const datalabel2 = [1681759873514, 1688654883620, 1688523871052, 1668476454296, 1668362147198]
 const data2 = [1305, 1207, 1209, 1207, 1205, 1203, 1205, 1207, 1210, 1212];
 const data1 = [1012, 1014, 1008, 1013, 1011, 1011, 1004, 1014, 1004, 1009];
 
-const flightStats = reactive({
-  labels: ["1", "2", "3", "4", "5"],
+const flightStats = {
+  labels: filterDataLabel(datalabel1, "all"),
   datasets: [
     {
       data: [1, 2, 3, 4, 5],
@@ -112,10 +104,10 @@ const flightStats = reactive({
       backgroundColor: "#f87979",
     },
   ],
-});
+};
 
-const timePerFlightStats = reactive({
-  labels: ["1", "2", "3", "4", "5"],
+const timePerFlightStats = {
+  labels: filterDataLabel(datalabel2, "all"),
   datasets: [
     {
       data: [1.3, 2.5, 1.1, 0.3, 1.8],
@@ -123,12 +115,20 @@ const timePerFlightStats = reactive({
       backgroundColor: "#f87979",
     },
   ],
-});
+};
 
-
-
-const computedDataLabel = ref(filterDataLabel(dataLabel, chartTimeFrame.value))
-
+const chartData = {
+    labels: filterDataLabel(dataLabel, "all"),
+    datasets: [{
+    data: data1,
+    label: 'Flughöhe',
+    backgroundColor: '#f87979'
+    },
+    {data: data2,
+    label: 'Höhe über Grund',
+    backgroundColor: '#29344B'
+    }
+  ]};
 
 const chartOptions = { responsive: true };
 
@@ -148,17 +148,7 @@ function filterDataLabel(dataLabel, chartTimeFrame) {
   }
 }
 
-const chartData = {
-    labels: computedDataLabel.value,
-    datasets: [{
-    data: data1,
-    label: 'Flughöhe',
-    backgroundColor: '#f87979'
-    },
-    {data: data2,
-    label: 'Höhe über Grund',
-    backgroundColor: '#29344B'
-    }]};
+
 
     
 

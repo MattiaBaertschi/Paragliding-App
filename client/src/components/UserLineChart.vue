@@ -1,5 +1,5 @@
 <template>
-    <Line id="my-chart-id" :options="chartOptions" :data="chartData"/>
+    <Line id="my-chart-id" :options="chartOptions" :data="convertLabelsToReadableDates(chartData)"/>
 </template>
 
 <script setup>
@@ -11,7 +11,7 @@ ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
 const props = defineProps({
   chartData: { 
     type: Object,
-    default: ["1","2","3","4","5"]
+    default: []
     },
     chartOptions: {
         type: Object,
@@ -19,8 +19,14 @@ const props = defineProps({
     },
 })
 
+function convertLabelsToReadableDates(chartData) {
 
+  chartData.labels = chartData.labels.map(label => {
+    const date = new Date(label);
+    return date.toLocaleDateString();
+  });
 
-
+  return chartData;
+}
 
 </script>
