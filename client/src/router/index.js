@@ -7,6 +7,8 @@ import AppSearch from "@/views/AppSearch.vue"
 import FlightOverview from "@/views/FlightOverview.vue"
 import ViewFlight from "@/views/ViewFlight.vue"
 import LoadingScreen from "@/views/LoadingScreen.vue"
+import LoginForm from "@/views/LoginForm.vue"
+import RegisterForm from "@/views/RegisterForm.vue"
 
 const routes = [
     {
@@ -48,8 +50,17 @@ const routes = [
         path: "/flights/view/:id",
         name: "viewflights",
         component: ViewFlight
+    },
+    {
+        path: "/login",
+        name: "Login",
+        component: LoginForm
+    },
+    {
+        path: "/register",
+        name: "Registrieren",
+        component: RegisterForm
     }
-    
 ]
 
 const router = createRouter({
