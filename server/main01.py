@@ -1,33 +1,71 @@
-from fastapi import FastAPI, File, UploadFile, Form
+from fastapi import Depends, FastAPI, File, UploadFile, Form, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import os
-import psycopg2
+import psycopg2 
 from utils.handle_igc import handle_igc
 import numpy as np
+from pydantic import BaseModel
+from datetime import datetime, timedelta
+from jose import jwt, JWTError
+from passlib.context import CryptContext
+
+
+#--------------------------- Setup for secure transfer -------------------------------#
+SECRET_KEY = "9339e87a096bf66cc23ea859614879384c1e82e8c31f62af45cddb90e3b191a3"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
+# TEST DB
+db = {
+    "tim":{
+        "username": "tim",
+        "full_name": "Tim von Felten",
+        "email": "tim.vonfelten@students.fhnw.ch",
+        "hashed_password": "$2b$12$3jcI2voZtHOCfTRdO3uZdOGlkW5QKR62YFb6LXev3pkzKqlholTd6", 
+        "disabled": False
+    }
+}
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: str or None = None
+
+class User(BaseModel):
+    username: str
+    email: str or None = None
+    full_name: str or None = None
+    disabled: bool or None = None
+
+class UserInDB(User):
+    hashed_password: str
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+OAuth_2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+#-------------------------------------------------------------------------------------#
 
 
 # connect to the Database
 conn = psycopg2.connect("dbname=flugbuch user=postgres password=e3jf9sp_39")
+ 
+#  # create cursor to execute database operations
+#  cur = conn.cursor()
+ 
+#  # execute querry
+#  cur.execute("SELECT polyline,flight_id, user_id, takeof, landing, biplace, date, glider FROM flight WHERE flight_id = 10")
+#  records = cur.fetchall()
+#  cur.execute("SELECT polyline FROM flight WHERE flight_id = 10")
+#  polyline = cur.fetchall()
 
-# create cursor to execute database operations
-cur = conn.cursor()
-
-# execute querry
-cur.execute("SELECT polyline,flight_id, user_id, takeof, landing, biplace, date, glider FROM flight WHERE flight_id = 10")
-records = cur.fetchall()
-cur.execute("SELECT polyline FROM flight WHERE flight_id = 10")
-polyline = cur.fetchall()
-
-# print(records[0][0])
-# print(records[0][1])
-# print(records[0][2])
-# print(polyline[0][0])
-#print(records)
 
 app = FastAPI()
 
-# Alow the Frontent to connet to the API
+#--------------------- Alow the Frontent to connet to the API ---------------------#
 origins = ["*"]
 
 app.add_middleware(
@@ -37,43 +75,149 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+#----------------------------------------------------------------------------------#
+
+# def verify_password(pLain_password, hashed_password):
+#     return pwd_context.verify(pLain_password, hashed_password)
+def verify_password(entered_password, stored_password):
+    if entered_password == stored_password:
+        return True
+    return False
+    
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def get_user(db, username: str):
+    if username in db:
+        user_data = db[username]
+        return UserInDB(**user_data)
+
+def authenticate_user(db, username: str, password: str):
+    user = get_user(db, username)
+    if not get_user(db,username):
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+    return user
+
+def create_access_token(data: dict, expires_delta: timedelta or None = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+async def get_current_user(token: str = Depends(OAuth_2_scheme)):
+    credential_exeption = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                        detail="Could not validate credentials", headers={"WWW-Authenticate":"Bearer"})
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credential_exeption
+
+        token_data = TokenData(username=username)
+
+    except JWTError:
+        raise credential_exeption
+
+    user = get_user(db, username=token_data.username)
+    if user is None:
+        raise credential_exeption
+
+    return user
+
+async def get_current_active_user(current_user: UserInDB = Depends(get_current_user)):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+
+    return current_user
+
+@app.post("/token", response_model=Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Could not validate credentials", headers={"WWW-Authenticate":"Bearer"})
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires)
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/users/me", response_model=User)
+async def read_users_me(current_user: User = Depends(get_current_active_user)):
+    return current_user
+
+@app.get("/users/me/items")
+async def read_own_items(current_user: User = Depends(get_current_active_user)):
+    return [{"item_id":1, "owner": current_user}]
 
 
+# Just a code sinppet to check if the DB connetion is working
 @app.get("/")
 async def root():
-    return records
+    cur = conn.cursor()
+    cur.execute("SELECT user_id FROM users")
+    rec = cur.fetchall()
+    return rec
 
 # User-Login
 @app.post("/login")
 async def login(user, pw):
     try:
-        cur.execute(f"SELECT benutzer_id, benutzername, passwort FROM benutzer WHERE benutzername = '{user}'")
+        cur.execute(f"SELECT user_id, hashed_password, password FROM users WHERE username = '{user}'")
         rec = cur.fetchall()
 
         log = {
             'id': f"{rec[0][0]}",
             'username': f"{rec[0][1]}",
-            'passwort': f"{rec[0][2]}"
+            'password': f"{rec[0][2]}"
         }
 
-        if pw == log['passwort']:#log.password:
+        if pw == log['password']:
             print(log['id'])
             return log
         return "passwordwrong"
     except:
         return "usernotfound"
 
-# Upload Photo
-@app.post('/upload_image')
-async def upload_photo(file: UploadFile = File(...)):
-    allowedFiles = {"image/jpeg", "image/png", "imgage/gif","image/tiff", "image/bmp", "video/webm"}
-    if file.content_type in allowedFiles:
-        filename = file.filename
-        with open(os.path.join('./data/image', filename), 'wb') as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        return 'Photo uploaded successfully'
-    else:
-        return 'wrongfiletype'
+
+#Single Image Upload --------------------------------------------------------------
+    # @app.post('/upload_image')
+    # async def upload_image(file: UploadFile = File(...)):
+    #     allowedFiles = {"image/jpeg", "image/png", "imgage/gif","image/tiff", "image/bmp", "video/webm"}
+    #     if file.content_type in allowedFiles:
+    #         filename = file.filename
+    #         with open(os.path.join('./data/image', filename), 'wb') as buffer:
+    #             shutil.copyfileobj(file.file, buffer)
+    #         return 'Photo uploaded successfully'
+    #     else:
+    #         return 'wrongfiletype'
+# ----------------------------------------------------------------------------------
+
+
+
+# Upload / change Items
+@app.post('/multi_image')
+async def mulit_image(files: list[UploadFile] = File(...), user_id: str = Form(...)):
+        allowed_files = {"image/jpeg", "image/png", "image/gif", "image/tiff", "image/bmp", "video/webm"}
+        bad_files = []
+        for f in files:
+            if f.content_type not in allowed_files:
+                bad_files.append(f.filename)
+        if len(bad_files) > 0:
+            return f'Wrong file types: {bad_files}'
+        else:
+            for f in files:
+                filename = f.filename
+                with open(os.path.join('./data/image', filename), 'wb') as buffer:
+                    shutil.copyfileobj(f.file, buffer)
+            return 'Photos uploaded successfully'
+
 
 # Upload IGC
 @app.post('/upload_igc')
