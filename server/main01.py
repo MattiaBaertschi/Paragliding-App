@@ -3,13 +3,13 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import os
-import psycopg2 
+import psycopg2
 from utils.handle_igc import handle_igc
 import numpy as np
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
-from passlib.context import CryptContext
+#from passlib.context import CryptContext
 
 
 #--------------------------- Setup for secure transfer -------------------------------#
@@ -45,7 +45,7 @@ class User(BaseModel):
 class UserInDB(User):
     hashed_password: str
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 OAuth_2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 #-------------------------------------------------------------------------------------#
 
@@ -77,15 +77,20 @@ app.add_middleware(
 )
 #----------------------------------------------------------------------------------#
 
+
+
+#------------------------ Functions for the Login process--------------------------#
+
 # def verify_password(pLain_password, hashed_password):
 #     return pwd_context.verify(pLain_password, hashed_password)
+
 def verify_password(entered_password, stored_password):
     if entered_password == stored_password:
         return True
     return False
-    
-def get_password_hash(password):
-    return pwd_context.hash(password)
+
+#def get_password_hash(password):
+#    return pwd_context.hash(password)
 
 def get_user(db, username: str):
     if username in db:
@@ -134,10 +139,10 @@ async def get_current_user(token: str = Depends(OAuth_2_scheme)):
 async def get_current_active_user(current_user: UserInDB = Depends(get_current_user)):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
-
     return current_user
 
-@app.post("/token", response_model=Token)
+
+@app.post("/login", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -165,25 +170,6 @@ async def root():
     rec = cur.fetchall()
     return rec
 
-# User-Login
-@app.post("/login")
-async def login(user, pw):
-    try:
-        cur.execute(f"SELECT user_id, hashed_password, password FROM users WHERE username = '{user}'")
-        rec = cur.fetchall()
-
-        log = {
-            'id': f"{rec[0][0]}",
-            'username': f"{rec[0][1]}",
-            'password': f"{rec[0][2]}"
-        }
-
-        if pw == log['password']:
-            print(log['id'])
-            return log
-        return "passwordwrong"
-    except:
-        return "usernotfound"
 
 
 #Single Image Upload --------------------------------------------------------------
