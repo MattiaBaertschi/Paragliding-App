@@ -1,9 +1,23 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import json
 app = FastAPI()
 
 origins = ["*"]
+
+users_db = [
+    {"username": "user1", "password": "hashed_password_1"},
+    {"username": "user2", "password": "hashed_password_2"},
+]
+
+class UserIn(BaseModel):
+    username: str
+
+class UserOut(BaseModel):
+    username: str
+    password: str  # In einer realen Anwendung sollten Sie das Passwort NICHT in der Antwort zurückgeben
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -288,6 +302,8 @@ json_string = '''
 
 '''
 
+
+
 @app.get("/")
 async def root():
     return json.loads(json_string)
@@ -311,3 +327,25 @@ async def root():
 @app.post("/uploadflight/")
 async def create_upload_file(file: UploadFile = File(...)):
     return {"filename": file.filename}
+
+@app.post("/user", response_model=UserOut)
+async def fetch_user(user_in: UserIn):
+    for user in users_db:
+        if user["username"] == user_in.username:
+            return user
+    return {"error": "User not found"}
+
+@app.post("/login")
+async def root():
+    return {
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0aW0iLCJleHAiOjE2ODMwMzM4MTd9.SR70opNiOg2zSd7gDIPjj4G5-oF67AZwXyFWPEyVPW8",
+  "token_type": "bearer"
+}
+
+@app.post("/register")
+async def root():
+    return {
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0aW0iLCJleHAiOjE2ODMwMzM4MTd9.SR70opNiOg2zSd7gDIPjj4G5-oF67AZwXyFWPEyVPW8",
+  "token_type": "bearer"
+}
+
