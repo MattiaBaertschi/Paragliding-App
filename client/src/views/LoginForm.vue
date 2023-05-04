@@ -13,6 +13,7 @@
         <label for="password" class="block text-sm mb-2">Passwort: </label>
         <input id="password" v-model="password" type="password" required class="border border-gray-400 p-2 rounded w-64" />
       </div>
+      <div v-if="loginError" class="text-sm mb-4 w-60 text-red-600">{{ errorMessage }}</div>
       <button type="submit" class="bg-primary hover:bg-secondary text-white tracking-wider py-2 px-4 rounded">Login</button>
     </form>
   </div>
@@ -27,14 +28,20 @@
   const SessionStore = useSessionStore()
   const username = ref('');
   const password = ref('');
+  const loginError = ref(false);
+  const errorMessage = ref('');
   
   async function handleLogin() {
     try {
-      const user = await SessionStore.login(username.value, password.value);
-      console.log('Login erfolgreich', username.value);
-      router.push('/home');
+      await SessionStore.login(username.value, password.value);
+      if (SessionStore.username != null){
+        console.log('Login erfolgreich', username.value);
+        router.push('/home');
+      }
     } catch (error) {
       console.error('Login fehlgeschlagen', error);
+      loginError.value = true;
+      errorMessage.value = 'Anmeldung fehlgeschlagen.';
     }
   }
   </script>

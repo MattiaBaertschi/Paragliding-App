@@ -3,6 +3,7 @@
     <img src="https://www.shutterstock.com/image-vector/cheerful-gray-cat-enjoys-paragliding-260nw-1981432805.jpg" alt="Profilbild" class="w-32 h-32 rounded-full mb-4">
 
     <h2 class="text-xl mb-4 font-bold text-gray-800 mb-2">{{ sessionStore.username }}</h2>
+    <p v-if="sessionStore.sessionToken != null" class="text-xs mb-2">Token vorhanden</p>
 
     <div class="flex mb-4 gap-x-2">
       <router-link to="/profil/bearbeiten" class="bg-primary hover:bg-secondary text-white rounded-full px-4 py-2">Bearbeiten</router-link>
