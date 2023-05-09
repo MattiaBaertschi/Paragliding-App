@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center items-center flex-col my-8">
+  <div class="flex justify-center items-center flex-col my-16 bg-white p-8 rounded-xl">
     <div class="text-center">
       <img :src="imageSrc" alt="Cloudys" class="w-48 h-48 mx-auto mb-8">
       <h2 class="text-2xl  mb-4">Login</h2>

@@ -25,7 +25,7 @@ const fetchData = async () => {
 <template>
     <div>
     <RouterLink to="upload">
-        <div class="bg-light rounded-lg shadow-md overflow-hidden my-4">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden my-4 hover:bg-black hover:text-white">
           <div class="p-2 text-center">
             <div class="text-lg font-semibold mt-1">+ Flug hochladen</div>
             <div class="text-gray-700 mb-2">

@@ -2,7 +2,7 @@
   <div class="bg-white rounded-lg shadow-md overflow-hidden my-8">
     <div class="relative h-64">
       <MapComponent v-show="currentImage === -1" :flightPath="flight.polyline" />
-      <div v-show="currentImage === -1" class="absolute top-2 left-2 px-3 py-1 bg-white text-dark font-semibold rounded-lg text-sm tracking-wider">{{ flight.temp }} | {{ flight.wind }}</div>
+      <!--<div v-show="currentImage === -1" class="absolute top-2 left-2 px-3 py-1 bg-white text-dark font-semibold rounded-lg text-sm tracking-wider">{{ flight.date }}</div>-->
 
       <img
         v-for="(image, index) in images"
@@ -28,13 +28,15 @@
     <div class="p-4">
     <div class="text-sm text-gray-600 mb-2">{{ flight.date }} | @{{ flight.benutzer_id }}userhandle</div>
     <div class="text-lg font-semibold mb-2">{{flight.flight_name}}</div>
-    <div class="text-gray-700 mb-2">
+    <div class="text-gray-700">
       <div>{{ flight.takeoff }} -> {{ flight.landing }}</div>
       <div>Flugdauer: {{ flight.flighttime }}</div>
       <div>{{ flight.comment }}</div>
     </div>
-    <RouterLink :to="`flights/view/${ flight.id }`">
-    <a class="text-dark font-bold underline-offset-3 underline decoration-2">Flug ansehen</a>
+    </div>
+    <div class="w-full bg-light text-center p-2 tracking-wider hover:bg-black hover:text-white">
+    <RouterLink :to="`flights/view/${ flight.id }`" class="w-full">
+    <a class="w-full">Flug ansehen</a>
     </RouterLink>
   </div>
   </div>

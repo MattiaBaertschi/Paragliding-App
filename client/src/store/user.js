@@ -11,7 +11,7 @@ export const useSessionStore = defineStore({
   
     state: () => ({
       sessionToken: null,
-      username: "schnall"
+      username: null,
     }),
     
     actions: {

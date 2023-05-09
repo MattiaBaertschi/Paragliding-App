@@ -28,11 +28,6 @@ const props = defineProps({
   [46.3761, 8.02675],
   [46.376067, 8.026633]
 ]},
-
-mapControls: {
-  type: Boolean,
-  default: false
-  },
 })
 
 const center = ref([828127, 5934275]);
@@ -112,15 +107,16 @@ onMounted( () => {
 
 <template>
 
-  <div class="w-full h-full object-cover">
-  <ol-map ref="map" :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" :mouseWheelZoom="mapControls" :key="mapControls" style="height:100%">
+  <div class="w-full h-full object-cover p-1 rounded-xl bg-white">
+  <ol-map ref="map" :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" :mouseWheelZoom="false" style="height:100%">
 
   <ol-view ref="view" :center=calcMapCenter(flightPathWebMecator) :rotation="rotation" :zoom="zoom" :projection="projection" />
-  <ol-zoom-control v-if="mapControls"/>
-  <ol-fullscreen-control v-if="mapControls"/>
+
+  <!--
   <ol-tile-layer>
       <ol-source-osm />
   </ol-tile-layer>
+  -->
 
 
   <ol-vector-layer>
@@ -132,9 +128,11 @@ onMounted( () => {
                     <ol-style-stroke :color="strokeColor" :width="strokeWidth"></ol-style-stroke>          
             </ol-style>
         </ol-feature>
-
+<!--
         <ol-feature>
+          
           <ol-geom-point :coordinates="start_coordinate"></ol-geom-point>
+          
           <ol-style>
             <ol-style-circle :radius="radius">
               <ol-style-fill :color="startColor"></ol-style-fill>
@@ -158,6 +156,7 @@ onMounted( () => {
             </ol-style-circle>
           </ol-style>
         </ol-feature>
+        -->
   </ol-source-vector>
   </ol-vector-layer>
 

@@ -6,8 +6,7 @@
     <p v-if="sessionStore.sessionToken != null" class="text-xs mb-2">Token vorhanden</p>
 
     <div class="flex mb-4 gap-x-2">
-      <router-link to="/profil/bearbeiten" class="bg-primary hover:bg-secondary text-white rounded-full px-4 py-2">Bearbeiten</router-link>
-      <router-link to="/profil/share" class="bg-primary hover:bg-secondary text-white rounded-full px-4 py-2">Teilen</router-link>
+      <router-link to="/profil/bearbeiten" class="bg-white hover:bg-secondary rounded-full px-4 py-2">Bearbeiten</router-link>
     </div>
   </div>
 
@@ -28,13 +27,13 @@
 
     <div class="pt-4 flex gap-2">
     <RouterLink to="/flights" class="flex my-2 w-1/2">
-        <div class="bg-light w-full p-4 rounded-xl">
+        <div class="bg-white w-full p-4 rounded-xl">
             <div class="text-black uppercase font-bold text-sm tracking-wider">#122</div>
             <div class="text-2xl font-semibold">Flüge</div>
         </div>
     </RouterLink>
     <RouterLink to="/flights" class="flex my-2 w-1/2">
-        <div class="bg-light w-full p-4 rounded-xl">
+        <div class="bg-white w-full p-4 rounded-xl">
             <div class="text-black uppercase font-bold text-sm tracking-wider">#15</div>
             <div class="text-2xl font-semibold">Airbudys</div>
         </div>
@@ -57,7 +56,7 @@
                 <button @click="displayChartType = 2" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-primary text-white': displayChartType === 2 }">⌀ Zeit/Flug</button>
             </div>
         </div>
-        <div v-if="displayChartType == 0">primary
+        <div v-if="displayChartType == 0">
             <UserLineChart :chartOptions="chartOptions" :chartData="chartData" :key="updateKey"/>
         </div>
         <div v-if="displayChartType == 1">
@@ -69,9 +68,9 @@
     </div>
     <div class="my-64">
       <p class="mb-4">Cloudy übernimmt keine Gewähr für die Korrektheit der dargestelltetn Daten.</p>
-      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full">Alle Daten exportieren</button>
-      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full">Alle Daten Löschen</button>
-      <button @click="sessionStore.logout(); router.push('/login');" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full">Log out</button>
+      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-white rounded-full">Alle Daten exportieren</button>
+      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-white rounded-full">Alle Daten Löschen</button>
+      <button @click="sessionStore.logout(); router.push('/login');" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-white rounded-full">Log out</button>
     </div>
 </template>
 
