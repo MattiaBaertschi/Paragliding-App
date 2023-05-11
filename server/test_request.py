@@ -1,17 +1,27 @@
 import requests
+from requests.auth import HTTPBasicAuth
 
-token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0aW0iLCJleHAiOjE2ODMwMTUwNzB9.ohH2LTOgTPpDn6Nh1pSReIJFHUppWI2frX4YJ4qqioQ"
-
-
-url = "http://localhost:8000/users/me"
+url = "https://hoemknoebi.internet-box.ch/api/login"
 
 
-headers = {
-    "Authorization": f"Bearer {token}"
+# Define the username and password for authentication
+username = 'tim'
+password = 'pw'
+
+# Define the request parameters as a dictionary
+request_params = {
+    'grant_type': 'password',
+    'username': username,
+    'password': password
 }
 
-response = requests.get(url, headers=headers)
+# Send the request to the API with HTTP Basic authentication and the request parameters
+response = requests.post(url, auth=HTTPBasicAuth('client_id', 'client_secret'), data=request_params)
 
+# Check the response status code
+if response.status_code == requests.codes.ok:
+    print("Request successful!")
+else:
+    print("Error in request:", response.status_code)
 
-
-print(response.text)
+print(response.json()['access_token'])

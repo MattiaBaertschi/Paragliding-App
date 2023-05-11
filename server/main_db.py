@@ -9,18 +9,11 @@ import numpy as np
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
-import json
-
-# Load the Informations within the Json secret File (Gitignore)
-with open('./utils/secret.json') as f:
-    json_secret = json.load(f)
-db_password = json_secret["db_password"]
-
 #from passlib.context import CryptContext
 
 
 #--------------------------- Setup for secure transfer -------------------------------#
-SECRET_KEY = json_secret['secret_key']
+SECRET_KEY = "9339e87a096bf66cc23ea859614879384c1e82e8c31f62af45cddb90e3b191a3"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -58,7 +51,7 @@ OAuth_2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 # connect to the Database
-conn = psycopg2.connect(f"dbname=flugbuch user=postgres password={db_password}")
+conn = psycopg2.connect("dbname=flugbuch user=postgres password=e3jf9sp_39")
  
 #  # create cursor to execute database operations
 #  cur = conn.cursor()
@@ -88,23 +81,20 @@ app.add_middleware(
 
 #------------------------ Functions for the Login process--------------------------#
 
-# def verify_password(pLain_password, hashed_password):
-#     return pwd_context.verify(pLain_password, hashed_password)
-
 def verify_password(entered_password, stored_password):
     if entered_password == stored_password:
         return True
     return False
 
-#def get_password_hash(password):
-#    return pwd_context.hash(password)
+def get_user(db, username: str):
+    with conn.cursor() as cur:
+        cur.execute()
 
 def get_user(db, username: str):
     if username in db:
         user_data = db[username]
         return UserInDB(**user_data)
 
-print(get_user(db, "tim"))
 
 def authenticate_user(db, username: str, password: str):
     user = get_user(db, username)
