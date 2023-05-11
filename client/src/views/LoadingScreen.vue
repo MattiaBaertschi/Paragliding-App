@@ -13,7 +13,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 setTimeout(() => {
-  router.push('/home');
+  router.push('/login');
 }, 3000);
 
 </script>

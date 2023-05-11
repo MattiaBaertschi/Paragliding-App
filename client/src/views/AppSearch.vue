@@ -1,19 +1,19 @@
 <template>
   <div>
-    <div class="text-2xl mb-4">Suche nach <select v-model="searchType">
+    <div class="text-2xl mb-4 bg-white p-4 text-lg rounded-xl">Suche nach <select v-model="searchType">
         <option value="all">Flügen & Buddys</option>
         <option value="flights">Flügen</option>
         <option value="users">Buddys</option>
       </select>
       <span  v-if="searchType === 'all' || searchType === 'flights'">
-      von
+        <br>von
       <select v-model="searchUser">
         <option value="all">allen</option>
         <option value="me">mir</option>
         <option value="buddys">buddys</option>
-      </select>
-      im Zeitraum von
-      <input type="date" v-model="searchDate_start" />
+      </select><br>
+      von
+      <input type="date" v-model="searchDate_start" /><br>
       bis
       <input type="date" v-model="searchDate_end" />
     </span>
@@ -22,7 +22,7 @@
     <input type="text" v-model="searchQuery" class="w-full border-2 rounded-full p-2 mb-4" placeholder="Suchbegriff" />
     
     <div v-if="searchType === 'all' || searchType === 'flights'">
-      <h3 class="text-base font-bold uppercase tracking-widest mt-8">Flüge:</h3>
+      <h3 class="text-base font-bold uppercase tracking-widest mt-8 text-black">Flüge:</h3>
       <ul>
         <li v-for="flight in filteredFlights" :key="flight.id">
           <RouterLink :to="`flights/view/${ flight.id }`">
@@ -33,7 +33,7 @@
     </div>
 
     <div v-if="searchType === 'all' || searchType === 'users'">
-      <h3 class="text-base font-bold uppercase tracking-widest mt-8">Buddys:</h3>
+      <h3 class="text-base font-bold uppercase tracking-widest mt-8 text-black">Buddys:</h3>
       <ul>
         <li v-for="user in filteredUsers" :key="user.id">
           <UserCard :user="user" />

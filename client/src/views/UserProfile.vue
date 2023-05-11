@@ -2,11 +2,11 @@
     <div class="flex flex-col items-center">
     <img src="https://www.shutterstock.com/image-vector/cheerful-gray-cat-enjoys-paragliding-260nw-1981432805.jpg" alt="Profilbild" class="w-32 h-32 rounded-full mb-4">
 
-    <h2 class="text-xl font-bold text-gray-800 mb-2">Max Mustermann</h2>
+    <h2 class="text-xl mb-4 font-bold text-gray-800 mb-2">{{ sessionStore.username }}</h2>
+    <p v-if="sessionStore.sessionToken != null" class="text-xs mb-2">Token vorhanden</p>
 
     <div class="flex mb-4 gap-x-2">
-      <router-link to="/profil/bearbeiten" class="bg-primary hover:bg-secondary text-white rounded-full px-4 py-2">Bearbeiten</router-link>
-      <router-link to="/profil/share" class="bg-primary hover:bg-secondary text-white rounded-full px-4 py-2">Teilen</router-link>
+      <router-link to="/profil/bearbeiten" class="bg-white hover:bg-secondary rounded-full px-4 py-2">Bearbeiten</router-link>
     </div>
   </div>
 
@@ -27,13 +27,13 @@
 
     <div class="pt-4 flex gap-2">
     <RouterLink to="/flights" class="flex my-2 w-1/2">
-        <div class="bg-light w-full p-4 rounded-xl">
+        <div class="bg-white w-full p-4 rounded-xl">
             <div class="text-black uppercase font-bold text-sm tracking-wider">#122</div>
             <div class="text-2xl font-semibold">Flüge</div>
         </div>
     </RouterLink>
     <RouterLink to="/flights" class="flex my-2 w-1/2">
-        <div class="bg-light w-full p-4 rounded-xl">
+        <div class="bg-white w-full p-4 rounded-xl">
             <div class="text-black uppercase font-bold text-sm tracking-wider">#15</div>
             <div class="text-2xl font-semibold">Airbudys</div>
         </div>
@@ -42,18 +42,18 @@
     <div>
         <div class="flex items-center justify-between mt-8">
             <div class="flex flex-col">
-                <button @click="setChartTimeFrame('all'); updateKey += 1" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': chartTimeFrame === 'all'}">Alle</button>
-                <button @click="setChartTimeFrame('year'); updateKey += 1"  class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': chartTimeFrame === 'year'}">Jahr</button>
-                <button @click="setChartTimeFrame('month'); updateKey += 1" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': chartTimeFrame === 'month'}">Monat</button>
+                <button @click="setChartTimeFrame('all'); updateKey += 1" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-primary text-white': chartTimeFrame === 'all'}">Alle</button>
+                <button @click="setChartTimeFrame('year'); updateKey += 1"  class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-primary text-white': chartTimeFrame === 'year'}">Jahr</button>
+                <button @click="setChartTimeFrame('month'); updateKey += 1" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-primary text-white': chartTimeFrame === 'month'}">Monat</button>
                 </div>
             <div class="text-center">
                 <div class="text-3xl font-bold mb-2">4 Flüge</div>
                 <div class="text-sm">August 2023</div>
             </div>
             <div class="flex flex-col">
-                <button @click="displayChartType = 0" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': displayChartType === 0 }">Flüge</button>
-                <button @click="displayChartType = 1" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': displayChartType === 1 }">Zeit</button>
-                <button @click="displayChartType = 2" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-black text-white': displayChartType === 2 }">⌀ Zeit/Flug</button>
+                <button @click="displayChartType = 0" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-primary text-white': displayChartType === 0 }">Flüge</button>
+                <button @click="displayChartType = 1" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-primary text-white': displayChartType === 1 }">Zeit</button>
+                <button @click="displayChartType = 2" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-primary text-white': displayChartType === 2 }">⌀ Zeit/Flug</button>
             </div>
         </div>
         <div v-if="displayChartType == 0">
@@ -68,18 +68,26 @@
     </div>
     <div class="my-64">
       <p class="mb-4">Cloudy übernimmt keine Gewähr für die Korrektheit der dargestelltetn Daten.</p>
-      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full">Alle Daten exportieren</button>
-      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-light rounded-full">Alle Daten Löschen</button>
+      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-white rounded-full">Alle Daten exportieren</button>
+      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-white rounded-full">Alle Daten Löschen</button>
+      <button @click="sessionStore.logout(); router.push('/login');" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-white rounded-full">Log out</button>
     </div>
 </template>
 
 <script setup>
 import { ref, reactive } from "vue";
 import UserLineChart from "@/components/UserLineChart.vue";
+import { useSessionStore } from '@/store/user';
+import { useRouter } from 'vue-router';
+  
+const router = useRouter();
+const sessionStore = useSessionStore();
+
 
 const updateKey = ref(0)
 const chartTimeFrame = ref("all");
 const displayChartType = ref(0);
+
 
 function setChartTimeFrame(value) {
   chartData.labels = filterDataLabel(dataLabel, value)
@@ -101,7 +109,7 @@ const flightStats = {
     {
       data: [1, 2, 3, 4, 5],
       label: "Flughöhe",
-      backgroundColor: "#f87979",
+      backgroundColor: "#B76126",
     },
   ],
 };
@@ -112,7 +120,7 @@ const timePerFlightStats = {
     {
       data: [1.3, 2.5, 1.1, 0.3, 1.8],
       label: "⌀ Flugzeit per Flug",
-      backgroundColor: "#f87979",
+      backgroundColor: "#B76126",
     },
   ],
 };
@@ -122,7 +130,7 @@ const chartData = {
     datasets: [{
     data: data1,
     label: 'Flughöhe',
-    backgroundColor: '#f87979'
+    backgroundColor: "#B76126"
     },
     {data: data2,
     label: 'Höhe über Grund',

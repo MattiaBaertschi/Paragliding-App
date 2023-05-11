@@ -14,9 +14,8 @@ async function register(username, password) {
 }
 
 async function login(username, password) {
-  const response = await axios.post(`${API_URL}/login`, {
-    username,
-  });
+  null
+  
 
   const user = response.data;
   const isValidPassword = await bcrypt.compare(password, user.password);

@@ -16,7 +16,7 @@
       </div>
     </div>
     <br>
-    <div class="bg-light rounded-lg shadow-md overflow-hidden my-4 text-lg font-semibold mt-1 p-2 text-center">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden my-4 text-lg font-semibold mt-1 p-2 text-center">
       <button v-on:click="addFile()">Select IGC File</button>
     </div>
     <br>
