@@ -1,5 +1,6 @@
 <template>
-    <carousel :items-to-show="1" :autoplay="5000" :wrap-around="true" class="mb-4">
+    <carousel :items-to-show="1" :autoplay="5000" :wrap-around="true" class="mb-2">
+      <slide :key="'map'"><MapComponent/></slide>
       <slide v-for="image in images" :key="Slide">
         <img
         :src="image"
@@ -19,6 +20,7 @@
 // If you are using PurgeCSS, make sure to whitelist the carousel CSS classes
 import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
+import MapComponent from "@/components/MapComponent.vue";
 
 const images = [
   "https://placekitten.com/640/200",

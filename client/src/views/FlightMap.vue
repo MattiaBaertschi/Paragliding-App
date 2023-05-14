@@ -115,10 +115,10 @@ console.log(getColorShade(1,500,499))
     />
     <ol-zoom-control/>
     <ol-fullscreen-control/>
-
     <ol-tile-layer>
-      <ol-source-osm />
+      <ol-source-xyz url="http://{1-4}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png" />
     </ol-tile-layer>
+
 
     <ol-interaction-select
       @select="featureSelected"

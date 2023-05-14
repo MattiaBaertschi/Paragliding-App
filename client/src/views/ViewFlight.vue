@@ -51,13 +51,12 @@ function toggleMap() {
     <div v-if="loaded == true">
     <div v-if="mapIsExpanded == false">
       <ImageCarousel/>
-      <ButtonComponent text="Flug bearbeiten" path="/edit" :icon="edit" />
-      <ButtonComponent text="Löschen" path="/delete" :icon="remove" />
+    
       <div class="bg-white p-4 rounded-xl my-4">
         <div class="text-2xl mb-4 tracking-wider font-bold">{{ currentFlight.data.flight_name }}</div>
         <div class="flex">
           <img :src="user" alt="Cloudys" class="w-6 h-6 mr-2">
-          <div class="text-xl mb-4">{{ currentFlight.data.user_id }} bitte noch name einfugen</div>
+          <div class="text-xl mb-4">{{ currentFlight.data.user_id }} Rüedel??</div>
         </div>
         <div class="flex">
           <img :src="takeoff" alt="Cloudys" class="w-6 h-6 mr-2">
@@ -75,6 +74,10 @@ function toggleMap() {
         <img :src="stopwatch" alt="Cloudys" class="w-6 h-6 mr-2">
         <div class="text-xl">{{ currentFlight.data.time }}Tschuldigung schnäu </div>
         </div>
+      </div>
+      <div class="mb-4">
+      <ButtonComponent text="Flug bearbeiten" path="/edit" :icon="edit" />
+      <ButtonComponent text="Löschen" path="/delete" :icon="remove" />
       </div>
     </div>
 
