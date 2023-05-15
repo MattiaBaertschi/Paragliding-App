@@ -1,8 +1,10 @@
 <template>
   <div class="bg-white rounded-lg shadow-md overflow-hidden my-8">
-    <div class="relative h-64">
+    <div class="relative">
+      <ImageCarousel/>
+      <!--
       <MapComponent v-show="currentImage === -1" :flightPath="flight.polyline" />
-      <!--<div v-show="currentImage === -1" class="absolute top-2 left-2 px-3 py-1 bg-white text-dark font-semibold rounded-lg text-sm tracking-wider">{{ flight.date }}</div>-->
+      <div v-show="currentImage === -1" class="absolute top-2 left-2 px-3 py-1 bg-white text-dark font-semibold rounded-lg text-sm tracking-wider">{{ flight.date }}</div>
 
       <img
         v-for="(image, index) in images"
@@ -21,7 +23,9 @@
           IMG {{ index + 1 }}
         </button>
       </div>
+    -->
     </div>
+
 
 
 
@@ -45,6 +49,7 @@
 <script setup>
 import { ref } from "vue";
 import MapComponent from "@/components/MapComponent.vue";
+import ImageCarousel from "@/components/ImageCarousel.vue";
 
 const props = defineProps({
   flight: {

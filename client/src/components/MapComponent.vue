@@ -46,6 +46,9 @@ const startColor = ref("green")
 const stopColor = ref("red")
 const coordinate = ref(toWebMercator([46.70383, 7.67178]));
 const radius = ref(5)
+const selected = ref(
+      "http://{1-4}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png"
+    );
 
 const flightPathWebMecator = computed(() => props.flightPath.map(toWebMercator));
 
@@ -118,8 +121,13 @@ onMounted( () => {
   <ol-view ref="view" :center=calcMapCenter(flightPathWebMecator) :rotation="rotation" :zoom="zoom" :projection="projection" />
   <ol-zoom-control v-if="mapControls"/>
   <ol-fullscreen-control v-if="mapControls"/>
+  <!--
   <ol-tile-layer>
       <ol-source-osm />
+  </ol-tile-layer>
+  -->
+  <ol-tile-layer>
+      <ol-source-xyz url="http://{1-4}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png" />
   </ol-tile-layer>
 
 

@@ -4,6 +4,15 @@ import { onMounted, reactive, toRaw, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import LineChart from "@/components/LineChart.vue";
 import MapComponent from "@/components/MapComponent.vue";
+import ImageCarousel from "@/components/ImageCarousel.vue";
+import ButtonComponent from "@/components/ButtonComponent.vue";
+import takeoff from '@/assets/takeoff.svg';
+import landing from '@/assets/landing.svg';
+import date from '@/assets/date.svg';
+import remove from '@/assets/remove.svg';
+import edit from '@/assets/edit.svg';
+import stopwatch from '@/assets/stopwatch.svg';
+import user from '@/assets/user.svg';
 
 var loaded = ref(false)
 var mapIsExpanded = ref(false)
@@ -41,12 +50,35 @@ function toggleMap() {
     <span class="hidden">{{ currentFlight.data }}</span>
     <div v-if="loaded == true">
     <div v-if="mapIsExpanded == false">
-      <div class="uppercase tracking-widest font-semibold text-xs text-secondary mb-1">Datum</div>
-      <div class="text-3xl mb-4">{{ currentFlight.data.date }}</div>
-      <div class="uppercase tracking-widest font-semibold text-xs text-secondary mb-1">Startplatz</div>
-      <div class="text-3xl mb-4">{{ currentFlight.data.takeoff }}</div>
-      <div class="uppercase tracking-widest font-semibold text-xs text-secondary mb-1">Landeplatz</div>
-      <div class="text-3xl mb-4">{{ currentFlight.data.landing }}</div>
+      <ImageCarousel/>
+    
+      <div class="bg-white p-4 rounded-xl my-4">
+        <div class="text-2xl mb-4 tracking-wider font-bold">{{ currentFlight.data.flight_name }}</div>
+        <div class="flex">
+          <img :src="user" alt="Cloudys" class="w-6 h-6 mr-2">
+          <div class="text-xl mb-4">{{ currentFlight.data.user_id }} Rüedel??</div>
+        </div>
+        <div class="flex">
+          <img :src="takeoff" alt="Cloudys" class="w-6 h-6 mr-2">
+          <div class="text-xl mb-4">{{ currentFlight.data.takeoff }}</div>
+        </div>
+        <div class="flex">
+          <img :src="landing" alt="Cloudys" class="w-6 h-6 mr-2">
+          <div class="text-xl mb-4">{{ currentFlight.data.landing }}</div>
+        </div>
+        <div class="flex">
+          <img :src="date" alt="Cloudys" class="w-6 h-6 mr-2">
+          <div class="text-xl mb-4">{{ currentFlight.data.date }}</div>
+        </div>
+        <div class="flex">
+        <img :src="stopwatch" alt="Cloudys" class="w-6 h-6 mr-2">
+        <div class="text-xl">{{ currentFlight.data.time }}Tschuldigung schnäu </div>
+        </div>
+      </div>
+      <div class="mb-4">
+      <ButtonComponent text="Flug bearbeiten" path="/edit" :icon="edit" />
+      <ButtonComponent text="Löschen" path="/delete" :icon="remove" />
+      </div>
     </div>
 
       <div>
@@ -55,17 +87,10 @@ function toggleMap() {
         <!--<div class="absolute top-2 left-2 px-4 py-1 bg-black text-white rounded-lg text-sm tracking-wider">{{ currentFlight.data.temp }} | {{ currentFlight.data.wind }}</div>-->
         <div v-if="mapIsExpanded == true" class="absolute bottom-14 mx-auto px-4 py-4 bg-black text-white text-sm tracking-wider w-full text-center cursor-pointer" @click="toggleMap">Karte schliessen</div>
       </div>
-      <div @click="toggleMap" class="text-center py-2 bg-black text-white cursor-pointer">Karte öffnen</div>
-      <div class="mt-4">
-        <div class="text-sm text-gray-600 mb-2">{{ currentFlight.data.date }} | {{ currentFlight.data.firstname }} {{ currentFlight.data.lastname }}</div>
-        
-        <div class="text-lg font-semibold mb-2">{{ currentFlight.data.flight_name }}</div>
-        <div class="text-gray-700 mb-2">
-          <div>Flugdauer: {{ currentFlight.data.flighttime }}</div>
-          <div>{{ currentFlight.data.comment }}</div>
-        </div>
-      </div>
+      <div @click="toggleMap" class="w-full flex justify-center items-center bg-white hover:bg-medium tracking-wider py-2 px-4 rounded-xl my-2 mb-8 cursor-pointer">Karte öffnen</div>
     </div>
+    <h2 class="text-center text-xl mb-4">Statistik</h2>
+    <div><LineChart v-if="loaded == true" :dataLabel="currentFlight.data.time_stamps" :data1="currentFlight.data.alt" :data2="currentFlight.data.agl"/></div>
   </div>
 
 </template>

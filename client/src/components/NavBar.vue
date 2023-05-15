@@ -1,7 +1,7 @@
 <template>
     <div class="fixed bottom-0 w-full bg-light border-t border-gray-200 z-50">
     <nav class="flex justify-between mx-1">
-      <router-link to="/home" class="w-1/5 py-1 my-2 text-center text-xs font-medium text-black hover:bg-white" active-class="text-dark font-bold bg-white rounded-full">
+      <router-link to="/home" class="w-1/5 py-1 my-2 text-center text-xs font-medium text-black" active-class="text-dark font-bold bg-white rounded-full">
         <img v-show="activeRoute == '/home'" :src="homeIcon" alt="Home" class="inline h-6 w-6 mr-2" />
         <span class="leading-8">Home</span>
       </router-link>
