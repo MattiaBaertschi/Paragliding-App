@@ -51,6 +51,23 @@ Die Gleitschirm-App wurde in erster linie für mobile Anwendungen designet. Es h
     <img src="./image/home.png" alt="isolated" height="250">
   </div>
 </div>
+
+### Suche
+
+über die Suche können sowhl Flüge, wie auch andere Nutzende gesucht und gefunden werden. Nebst der gewöhnlichen Suche nach Stichwörtern können weitere Parameter eingestellt werden. So kann zum Beispiel nur nach Flügen oder Buddys (Andere Nutzende) gesucht werden oder auch nach beidem. Die Suche nach Flüge kann auch mittels zeitlichem Rahmen eingeschrenkt werde. Eine Suche über diverse Parameter ermöglicht dem Benuzenden schneller an die gewünschte Information zu gelangen.
+
+<img src="./image/search.png" alt="isolated" height="250">
+
+### Karte
+
+<div style="display: flex; align-items: flex-start;">
+  <div style="width: 50%;">
+    <img src="./image/map.png" alt="isolated" height="250">
+  </div>
+  <div style="width: 50%;">
+    <p></p>
+  </div>
+</div>
 </br>
 
 GitHub Repository: https://github.com/MattiaBaertschi/Paragliding-App
