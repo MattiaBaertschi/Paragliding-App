@@ -4,8 +4,14 @@ Es wurde mit den folgenden Frameworks gearbeitet:
 - Server: FastAPI
 - Client: VUE + OpenLayers
 
-Ziel der Applikation ist es ein Digitales Logbuch für Gleitschirmflüge bereitzustellen. Flüge können als IGC-File hochgeladen und mit Komentar, Bildern und weiteren Attibuten ergänzt werden. So wird eine einfache und effektive Dokumentation gewährleistet. Damit die hochgeladenen Flüge benuzerspezifisch aufgerufen werden können, wurde ein Loginsystem mit Userauthentifikation eingeführt. Wie man so schön sagt, ist geteilte Freude die schönste Freude. Daher wurd in dieser App auch eien Funktion implementiert um andern Benuzern folgen zu können und ihre Flugaktivität inklusive Impressionen in Form von Komentaren und Bildern anzusehen. Der sozilae Aspekt soll bei der vorgeführten App im Vordergrund stehen. Nicht der Wettkampf Gedanke sondern die Freude an einem Gemeinsamen Hobby soll Nutzende zum Gebrauch der Applikation animieren.
-
+<div style="display: flex; align-items: flex-start;">
+  <div style="width: 30%;">
+    <img src="./image/glider.gif" alt="isolated" height="300">
+  </div>
+  <div style="width: 70%; margin:10px">
+    <p>Ziel der Applikation ist es ein Digitales Logbuch für Gleitschirmflüge bereitzustellen. Flüge können als IGC-File hochgeladen und mit Komentar, Bildern und weiteren Attibuten ergänzt werden. So wird eine einfache und effektive Dokumentation gewährleistet. Damit die hochgeladenen Flüge benuzerspezifisch aufgerufen werden können, wurde ein Loginsystem mit Userauthentifikation eingeführt. Wie man so schön sagt, ist geteilte Freude die schönste Freude. Daher wurd in dieser App auch eien Funktion implementiert um andern Benuzern folgen zu können und ihre Flugaktivität inklusive Impressionen in Form von Komentaren und Bildern anzusehen. Der sozilae Aspekt soll bei der vorgeführten App im Vordergrund stehen. Nicht der Wettkampf Gedanke sondern die Freude an einem Gemeinsamen Hobby soll Nutzende zum Gebrauch der Applikation animieren.</p>
+  </div>
+</div>
 
 
 Die Gleitschirm-App wurde in erster linie für mobile Anwendungen designet. Es handelt sich wie bereits erwähnt um eine Soziale Platform und daher kommt der Ansatz die App beforzugt auf Smartphones zu nutzen.
@@ -18,11 +24,10 @@ Die Gleitschirm-App wurde in erster linie für mobile Anwendungen designet. Es h
   <div style="width: 30%;">
     <img src="./image/login.png" alt="isolated" height="300">
   </div>
-  <div style="width: 70%;">
+  <div style="width: 70%; margin:10px">
     <p>Da die Paragliding-App ledigliche auf Benuzterspezifischen Daten basiert, erscheint beim Start der App direkt eine Login Formular. Hier können sich bereits registrierte Benuztende einloggen. Wenn Noch kein Benuzendenkonto erstellt wurde kann dies mit dem Klick auf Registrieren gemacht werden.</p>
   </div>
 </div>
-</br>
 
 ### Homepage
 
