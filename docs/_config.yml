@@ -1,4 +1,4 @@
-theme: jekyll-theme-minimal
+theme: creative-theme-jekyll
 title: Gleitschirm Social Media App
 description: Das ist die Projekt Website des Gleitschirm Social Media Apps. In dem beschriebenen Repository sind sowohl die Client wie auch die Server Umgebungen vorzufinden.
-logo: ./images/glider.gif
+logo: ./image/glider.gif
