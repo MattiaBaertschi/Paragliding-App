@@ -72,8 +72,7 @@ defineProps({
 //https://xctherm.com/data/regions.json
 
 
-function getColorShade(minValue, maxValue, value) {
-  
+function getColorShade(minValue, maxValue, value) {  
   const colorRange = 255;
   const index = Math.round((value - minValue) / (maxValue - minValue) * colorRange);
   const red = 0

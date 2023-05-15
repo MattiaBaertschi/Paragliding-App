@@ -2,7 +2,7 @@
   <div class="">
     <div class="hidden">
       <label>File
-        <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
+        <input type="file" ref="fileRef" @change="handleFileUpload"/>
       </label>
     </div>
     <div class="">
@@ -10,89 +10,78 @@
         <div class="p-4">
           {{ file.name }} 
         </div>
-        <div class="bg-light p-4" v-on:click="removeFile()">
+        <div class="bg-light p-4" @click="removeFile">
           Remove
         </div>
       </div>
     </div>
     <br>
     <div class="bg-white rounded-lg shadow-md overflow-hidden my-4 text-lg font-semibold mt-1 p-2 text-center">
-      <button v-on:click="addFile()">Select IGC File</button>
+      <button @click="addFile">Select IGC File</button>
     </div>
     <br>
     <div class="bg-primary rounded-lg shadow-md overflow-hidden my-4 text-lg font-semibold mt-1 p-2 text-center text-white">
-      <button v-on:click="submitFile()">Upload</button>
+      <button @click="submitFile">Upload</button>
     </div>
+    <div v-if="errorActive" class="text-red-800">Störung</div>
   </div>
 </template>
 
 <script>
+import { ref } from 'vue';
 import axios from 'axios';
+import { useSessionStore } from "@/store/user";
+
 export default {
-  /*
-    Defines the data used by the component
-  */
-  data(){
-    return {
-      file: null
-    }
-  },
-  /*
-    Defines the method used by the component
-  */
-  methods: {
-    /*
-      Adds a file
-    */
-    addFile(){
-      const fileInput =  this.$refs.file;
-      /*fileInput.accept = 'image/*'; // set accepted file types to images only
-      */
-      fileInput.multiple = false; // allow only one file to be selected
+  setup() {
+    const fileRef = ref(null);
+    const file = ref(null);
+    const sessionStore = useSessionStore()
+    const token = sessionStore.sessionToken
+    console.log("token",token)
+    const errorActive = ref(false)
+
+    const addFile = () => {
+      const fileInput = fileRef.value;
+      fileInput.multiple = false;
       fileInput.click();
-    },
-    /*
-      Submits file to the server
-    */
-    submitFile(){
-      if (!this.file) {
+    };
+
+    const handleFileUpload = () => {
+      file.value = fileRef.value.files[0];
+      console.log(file.value);
+    };
+
+    const removeFile = () => {
+      file.value = null;
+    };
+
+    const submitFile = async () => {
+      if (!file.value) {
         return;
       }
-      /*
-        Initialize the form data
-      */
+
       let formData = new FormData();
-      formData.append('file', this.file);
-      /*
-        Make the request to the POST /upload_igc URL
-      */
-      axios.post( 'http://localhost:8000/upload_igc',
-        formData,
-        {
+      formData.append('file', file.value);
+
+      try {
+          let response = await axios.post( 'https://hoemknoebi.internet-box.ch/api/upload_igc', formData, {
           headers: {
-              'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
           }
+        });
+        errorActive.value = false    
+        console.log('SUCCESS!!', response);
+        } 
+        catch (error) {
+          console.log('FAILURE!!', error);
+          errorActive.value = true
+          console.log("errorvalue", errorActive.value)
         }
-      ).then(function(){
-        console.log('SUCCESS!!');
-      })
-      .catch(function(){
-        console.log('FAILURE!!');
-      });
-    },
-    /*
-      Handles the uploading of a file
-    */
-    handleFileUpload(){
-      this.file = this.$refs.file.files[0];
-      console.log(this.file)
-    },
-    /*
-      Removes the uploaded file
-    */
-    removeFile(){
-      this.file = null;
-    }
+    };
+
+    return { fileRef, file, addFile, handleFileUpload, removeFile, submitFile, errorActive };
   }
 }
 </script>
