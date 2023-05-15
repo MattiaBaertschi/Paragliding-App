@@ -5,10 +5,10 @@ Es wurde mit den folgenden Frameworks gearbeitet:
 - Client: VUE + OpenLayers
 
 <div style="display: flex; align-items: flex-start;">
-  <div style="width: 30%;">
+  <div style="width: 40%;">
     <img src="./image/glider.gif" alt="isolated" height="300">
   </div>
-  <div style="width: 70%; margin:10px">
+  <div style="width: 60%; margin:10px">
     <p>Ziel der Applikation ist es ein Digitales Logbuch für Gleitschirmflüge bereitzustellen. Flüge können als IGC-File hochgeladen und mit Komentar, Bildern und weiteren Attibuten ergänzt werden. So wird eine einfache und effektive Dokumentation gewährleistet. Damit die hochgeladenen Flüge benuzerspezifisch aufgerufen werden können, wurde ein Loginsystem mit Userauthentifikation eingeführt. Wie man so schön sagt, ist geteilte Freude die schönste Freude. Daher wurd in dieser App auch eien Funktion implementiert um andern Benuzern folgen zu können und ihre Flugaktivität inklusive Impressionen in Form von Komentaren und Bildern anzusehen. Der sozilae Aspekt soll bei der vorgeführten App im Vordergrund stehen. Nicht der Wettkampf Gedanke sondern die Freude an einem Gemeinsamen Hobby soll Nutzende zum Gebrauch der Applikation animieren.</p>
   </div>
 </div>
