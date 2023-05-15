@@ -10,10 +10,9 @@ import json
 with open('./utils/secret.json') as f:
     json = json.load(f)
 
-
 # Define A Class for Credentials
 class Credentials:
-    def __init__(self, LOGIN_KEY, DB_USER, DB_PASS, DB_NAME, MAIL_PASS, MAIL_ADDRESS, MAIL_KEY):
+    def __init__(self, LOGIN_KEY, DB_USER, DB_PASS, DB_NAME, MAIL_PASS, MAIL_ADDRESS, MAIL_KEY, WEBSITE_HOME, WEBSITE_LOGIN):
         self.LOGIN_KEY = LOGIN_KEY
         self.DB_USER = DB_USER
         self.DB_PASS = DB_PASS
@@ -21,6 +20,8 @@ class Credentials:
         self.MAIL_PASS = MAIL_PASS
         self.MAIL_ADDRESS = MAIL_ADDRESS
         self.MAIL_KEY = MAIL_KEY
+        self.WEBSITE_HOME = WEBSITE_HOME
+        self.WEBSITE_LOGIN = WEBSITE_LOGIN
 # save Credetials
 
 Creds = Credentials(
@@ -30,27 +31,29 @@ Creds = Credentials(
     DB_NAME = json["DB"]["NAME"],
     MAIL_PASS = json["MAIL"]["PASS"],
     MAIL_ADDRESS = json["MAIL"]["ADDRESS"],
-    MAIL_KEY = json["MAIL"]["KEY"])
+    MAIL_KEY = json["MAIL"]["KEY"],
+    WEBSITE_HOME = json["WEBSITE"]["HOME"],
+    WEBSITE_LOGIN = json["WEBSITE"]["LOGIN"]
+    )
 
 engine = create_engine(f"postgresql://{Creds.DB_USER}:{Creds.DB_PASS}@localhost/{Creds.DB_NAME}", echo=True)
 Base = declarative_base()
 
 
 
-class Token(Base):
-    __tablename__ = "tokens"
+# class Token(Base):
+#     __tablename__ = "tokens"
 
-    token_id = Column(Integer, primary_key=True, autoincrement=True)
-    access_token = Column("access_token", String, unique=True)
-    token_type = Column("token_type", String)
+#     token_id = Column(Integer, primary_key=True, autoincrement=True)
+#     access_token = Column("access_token", String, unique=True)
+#     token_type = Column("token_type", String)
 
-    def __init__(self, token_id, access_token, token_type):
-        self.token_id = token_id
-        self.access_token = access_token
-        self.token_type = token_type
+#     def __init__(self, access_token, token_type):
+#         self.access_token = access_token
+#         self.token_type = token_type
     
-    def __repr__(self):
-        return f"Token({access_token})"
+#     def __repr__(self):
+#         return f"Token({access_token})"
 
 class TokenData:
     def __init__(self, username):
@@ -97,13 +100,13 @@ class User(Base):
 
     # this repr-function defines what you see if you print a User class
     def __repr__(self):
-        return json.dumps(self.to_dict())
+        return str(self.to_dict())
 
 class Fligth(Base):
     __tablename__ = "flights"
 
     flight_id = Column("flight_id", Integer, primary_key=True, autoincrement=True)
-    flight_name = Column("flight_name", String)
+    flight_name = Column("flight_name", String, default= None)
     pilot = Column(Integer, ForeignKey("users.user_id"))
     comment = Column("comment", VARCHAR, default=None)
     polyline = Column("polyline", ARRAY(Float), default= None)
@@ -116,7 +119,7 @@ class Fligth(Base):
     wind_kmh = Column("wind_kmh", Integer, default=None)
     temp_celsius = Column("temp_celsius", Integer, default=None)
 
-    def __init__(self, flight_name, pilot, comment=None, polyline=None, takeof=None, landing=None, biplace=None, date=None, img_link=None, glider=None, wind_kmh=None, temp_celsius=None):
+    def __init__(self, pilot, flight_name=None, comment=None, polyline=None, takeof=None, landing=None, biplace=None, date=None, img_link=None, glider=None, wind_kmh=None, temp_celsius=None):
         self.flight_name = flight_name
         self.pilot = pilot
         self.comment = comment
@@ -134,4 +137,3 @@ class Fligth(Base):
         return f"Flight( {self.flight_name} {self.takeof} {self.landing} pilot: {self.pilot})"
 
 Base.metadata.create_all(bind=engine)
-
