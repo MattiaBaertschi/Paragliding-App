@@ -54,9 +54,9 @@ def sendmail(reciver, username, register_token):
           <div class="container">
               <h1>Herzlich Wilkommen {username} zu Cloudy!</h1>
               <p>Bitte drücken Sie auf den untenstehenden Knopf, um ihre E-mailadresse zu bestätigen.</p>
-              <a href="#" style="display: inline-block; background-color: #007bff; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px; border: 1px solid #007bff;"><Button>Jetzt Bestätigen</Button></a>
+              <a href="https://hoemknoebi.internet-box.ch/api/verify/{register_token}" style="display: inline-block; background-color: #007bff; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px; border: 1px solid #007bff;">Jetzt Bestätigen</a>
               <p>Wenn der Knopf nicht funktieren sollte, kopieren Sie bitte den untenstehenden Link in ihren Browser:</p>
-              <p>http://localhost:8000/verify/{register_token}</p>
+              <p style="textsitze">https://hoemknoebi.internet-box.ch/api/verify/{register_token}</p>
               <p>Wenn Sie sich nicht auf der Website von Cloudy registriert haben bitte ingnorieren Sie diese E-mail</p>
               <p>Danke, dass Sie sich für Cloudy registriert haben!</p>
           </div>
@@ -70,7 +70,7 @@ def sendmail(reciver, username, register_token):
   # Create a secure SSL context
   context = ssl.create_default_context()
 
-  with smtplib.SMTP(host="smtp.office365.com", port=587) as server:
+  with smtplib.SMTP(host="mail.cyon.ch", port=587) as server:
       server.ehlo()
       server.starttls(context=context)
       server.ehlo()

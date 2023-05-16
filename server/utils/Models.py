@@ -70,12 +70,12 @@ class User(Base):
     firstname = Column("firstname", String)
     lastname = Column("lastname", String)
     password = Column("password", String)
-    shv_nr = Column("shv_nr", Integer,unique=True, default=None)
+    shv_nr = Column("shv_nr", Integer, default= None)
     verifyed = Column("verified", Boolean , default=False)    
     disabled = Column("disabled", Boolean , default=False)
 
     # constructor for the User class
-    def __init__(self, username, e_mail, firstname, lastname, password, shv_nr, verifyed, disabled):
+    def __init__(self, username, e_mail, firstname, lastname, password, verifyed, disabled, shv_nr=None):
         self.username = username
         self.e_mail = e_mail
         self.firstname = firstname
