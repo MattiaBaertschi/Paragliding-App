@@ -33,8 +33,10 @@
     <div class="text-sm text-gray-600 mb-2">{{ flight.date }} | @{{ flight.benutzer_id }}userhandle</div>
     <div class="text-lg font-semibold mb-2">{{flight.flight_name}}</div>
     <div class="text-gray-700">
+      <!--
       <div>{{ flight.takeoff }} -> {{ flight.landing }}</div>
-      <div>Flugdauer: {{ flight.flighttime }}</div>
+      <div>Flugdauer: {{ flight.flighttime }}</div>-->
+      <div>ID IST: {{ flight.id }}</div>
       <div>{{ flight.comment }}</div>
     </div>
     </div>

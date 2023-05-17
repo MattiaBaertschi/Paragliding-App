@@ -36,6 +36,7 @@ var currentFlight = reactive({ data: []})
     currentFlight.data = await fetchData()
     console.log("currentFlight", currentFlight.data)
     loaded.value = true
+    console.log("flugid ist:", currentFlight.data.id)
   })
 
 function toggleMap() {
@@ -51,7 +52,7 @@ function toggleMap() {
     <div v-if="loaded == true">
     <div v-if="mapIsExpanded == false">
       <ImageCarousel/>
-    
+
       <div class="bg-white p-4 rounded-xl my-4">
         <div class="text-2xl mb-4 tracking-wider font-bold">{{ currentFlight.data.flight_name }}</div>
         <div class="flex">
@@ -76,7 +77,8 @@ function toggleMap() {
         </div>
       </div>
       <div class="mb-4">
-      <ButtonComponent text="Flug bearbeiten" path="/edit" :icon="edit" />
+        <RouterLink :to="`edit/${ currentFlight.data.id }`">edit</RouterLink>
+        <ButtonComponent text="Flug bearbeiten" :path="`../edit/${ currentFlight.data.id }`" :icon="edit" />
       <ButtonComponent text="Löschen" path="/delete" :icon="remove" />
       </div>
     </div>

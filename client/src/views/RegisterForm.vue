@@ -66,8 +66,6 @@
   
   const router = useRouter();
   const sessionStore = useSessionStore();
-  const username = ref('');
-  const password = ref('');
   const loginError = ref(false);
   const errorMessage = ref('');
   var imageSrc = image_login;
@@ -99,7 +97,8 @@
     const result = v$.value.$validate();
     if (result){
       try {
-        const response = await sessionStore.register(username.value, password.value);
+        console.log("username ISCH", username.value)
+        const response = await sessionStore.register(username.value, email.value, password.value, firstName.value, lastName.value, shvNumber.value);
         console.log('Registrierung erfolgreich', response.data);
         router.push('/home');
       } catch (error) {

@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import axios from 'axios';
-import bcrypt from 'bcryptjs';
 
 const API_URL = 'http://127.0.0.1:8000';
 const url = 'https://hoemknoebi.internet-box.ch/api';
@@ -16,13 +15,9 @@ export const useSessionStore = defineStore({
     actions: {
         async login(username, password) {
             try {
-              const salt = await bcrypt.genSalt(10);
-              const hashedPassword = await bcrypt.hash(password, salt);
-
               const formData = new URLSearchParams();
                 formData.append('username', username);
-                formData.append('password', hashedPassword);
-                //formData.append('password', password)
+                formData.append('password', password);
                 formData.append('grant_type', 'password'); // Wenn die API OAuth2 verwendet, ist dies möglicherweise erforderlich
 
               const response = await axios.post(`${url}/login`, formData,
@@ -43,36 +38,30 @@ export const useSessionStore = defineStore({
             }
         },
 
-        async register(username, e_mail, firstname, lastname, password, shv_nr) {
-          try {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(password, salt);
-            console.log(hashedPassword)
-            const formData = new URLSearchParams();
-            formData.append('username', username);
-            formData.append('e_mail', e_mail);
-            formData.append('firstname', firstname);
-            formData.append('lastname', lastname);
-            formData.append('password', hashedPassword);
-            formData.append('shv_nr', shv_nr);
-            //formData.append('password', password)
-            formData.append('grant_type', 'password');
-            const register_response = await axios.post(`${url}/register`, formData, 
-              {
-                headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded'
-                }
-              
+        async register(username, email, password, firstname, lastname, shv_nr) {
+          try {  
+            const requestData = {
+              username: username,
+              e_mail: email,
+              password: password,
+              firstname: firstname,
+              lastname: lastname,
+              shv_nr: shv_nr,
+              grant_type: 'password'
+            };
+            
+            const register_response = await axios.post(`${url}/register`, null, {
+              params: requestData
             });
-            console.log("Registirerung erfolgreich", register_response)
+            
+            console.log("Registrierung erfolgreich", register_response);
           }
           catch(error) {
             console.log(error);
             throw error;
           }
-
         },
-          
+           
         logout() {
               this.sessionToken = null;
               this.username = null;

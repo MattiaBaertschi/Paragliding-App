@@ -1,9 +1,7 @@
 <script setup>
 import axios from 'axios';
 import { onMounted, reactive } from 'vue';
-import MapComponent from "@/components/MapComponent.vue"
 import CardComponent from "@/components/CardComponent.vue"
-
 
 const jsonData = reactive({ data: [] })
 
@@ -18,11 +16,9 @@ const fetchData = async () => {
     }
   }
 
-
   onMounted(async () => {
     jsonData.value = await fetchData()
   })
-
 </script>
 
 <template>
@@ -32,5 +28,4 @@ const fetchData = async () => {
         <CardComponent  :flight="flight"/> 
     </div>
   </div>
-
 </template>

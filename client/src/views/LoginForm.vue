@@ -47,6 +47,7 @@
       console.error('Login fehlgeschlagen', error);
       loginError.value = true;
       errorMessage.value = 'Anmeldung fehlgeschlagen.';
+      console.log(username.value, password.value)
       imageSrc = image_login_failed
     }
   }
