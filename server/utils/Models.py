@@ -1,8 +1,8 @@
-from sqlalchemy import ForeignKey, Column, String, Integer, CHAR, Boolean, VARCHAR, ARRAY, Float, Date, UniqueConstraint
+from sqlalchemy import ForeignKey, Column, String, Integer, CHAR, Boolean, VARCHAR, ARRAY, Float, Date, UniqueConstraint, Time
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 
 import json
 
@@ -39,22 +39,6 @@ Creds = Credentials(
 engine = create_engine(f"postgresql://{Creds.DB_USER}:{Creds.DB_PASS}@localhost/{Creds.DB_NAME}", echo=True)
 Base = declarative_base()
 
-
-
-# class Token(Base):
-#     __tablename__ = "tokens"
-
-#     token_id = Column(Integer, primary_key=True, autoincrement=True)
-#     access_token = Column("access_token", String, unique=True)
-#     token_type = Column("token_type", String)
-
-#     def __init__(self, access_token, token_type):
-#         self.access_token = access_token
-#         self.token_type = token_type
-    
-#     def __repr__(self):
-#         return f"Token({access_token})"
-
 class TokenData:
     def __init__(self, username):
         self.username = username
@@ -85,6 +69,7 @@ class User(Base):
         self.verifyed = verifyed
         self.diabled = disabled
 
+    # this is used for the authentification process
     def to_dict(self):
             return {
                 "user_id": self.user_id,
@@ -106,12 +91,17 @@ class Fligth(Base):
     __tablename__ = "flights"
 
     flight_id = Column("flight_id", Integer, primary_key=True, autoincrement=True)
-    flight_name = Column("flight_name", String, default= None)
     pilot = Column(Integer, ForeignKey("users.user_id"))
+    flight_name = Column("flight_name", String, default= None)
     comment = Column("comment", VARCHAR, default=None)
-    polyline = Column("polyline", ARRAY(Float), default= None)
-    takeof = Column("takeof", String, default=None)
+    gnss_records = Column("gnss_records", ARRAY(Float), default= None)
+    alt_gnss = Column("alt_gnss", ARRAY(Integer), default=None)
+    terrain = Column("terrain", ARRAY(Integer), default=None)
+    takeoff = Column("takeoff", String, default=None)
     landing = Column("landing", String, default=None)
+    start_time = Column("start_time", Time, default=None)
+    end_time = Column("end_time", Time, default=None)
+    duration = Column("duration", Time, default=None)
     biplace = Column("biplace", String, default=None)
     date = Column("date", Date, default=None)
     img_link = Column("img_link", String, default=None)
@@ -119,12 +109,19 @@ class Fligth(Base):
     wind_kmh = Column("wind_kmh", Integer, default=None)
     temp_celsius = Column("temp_celsius", Integer, default=None)
 
-    def __init__(self, pilot, flight_name=None, comment=None, polyline=None, takeof=None, landing=None, biplace=None, date=None, img_link=None, glider=None, wind_kmh=None, temp_celsius=None):
+    def __init__(self, pilot, flight_name=None, comment=None, gnss_records=None,  alt_gnss=None,  terrain=None,  takeoff=None, landing=None,  start_time = None, end_time = None, duration = None, biplace=None, date=None,  img_link=None,  glider=None,  wind_kmh=None,  temp_celsius=None):
         self.flight_name = flight_name
         self.pilot = pilot
         self.comment = comment
-        self.polyline = polyline
-        self.takeof = takeof
+        self.gnss_records = gnss_records
+        self.alt_gnss = alt_gnss
+        self.terrain = terrain
+        self.takeoff = takeoff       
+        self.landing = landing
+        self.start_time = start_time
+        self.end_time = end_time
+        self.duration = duration
+        self.takeoff = takeoff
         self.landing = landing
         self.biplace = biplace
         self.date = date
@@ -134,6 +131,23 @@ class Fligth(Base):
         self.temp_celsius = temp_celsius
 
     def __repr__(self):
-        return f"Flight( {self.flight_name} {self.takeof} {self.landing} pilot: {self.pilot})"
+        return f"Flight( {self.flight_name} {self.takeoff} {self.landing} pilot: {self.pilot})"
+
+class UserRelation(Base):
+    __tablename__ = 'user_relations'
+
+    user_relations_id = Column("user_relations_id", Integer, primary_key=True, autoincrement=True)
+    follower_id = Column("follower_id", Integer, ForeignKey("users.user_id"))
+    followed_id = Column(Integer, ForeignKey("users.user_id"))
+    acceptet = Column(Boolean)
+
+    def __init__ (self, follower_id, followed_id, acceptet):
+        self.follower_id = follower_id
+        self.followed_id = followed_id
+        self.acceptet = acceptet
+
+    def __repr__(self):
+        return f"{self.followed_id}"
+
 
 Base.metadata.create_all(bind=engine)
