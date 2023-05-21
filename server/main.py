@@ -18,13 +18,15 @@ from datetime import datetime, timedelta
 
 from utils.handle_igc import handle_igc
 from utils.handle_mail import sendmail
-from utils.Models import TokenData, Fligth, User, engine, Base, Creds
+from utils.Models import *
+from utils.functions import *
 
-from typing import Optional, Union, List
+from typing import Optional, List, Any
 
 import os
 
 import json
+
 
 
 #============================= Setup for secure login ================================#
@@ -44,7 +46,6 @@ OAuth_2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 Session = sessionmaker(bind=engine)
 session = Session()
 #=====================================================================================#
-
 
 
 #=================================== FAST API APP ====================================#
@@ -67,105 +68,6 @@ app.add_middleware(
 
 # Setting root directory for the jinja templates
 templates = Jinja2Templates(directory='./templates')
-
-
-#------------------------- Functions for the Login process ---------------------------#
-
-def is_valid_input(username, e_mail, firstname, lastname, password, shv_nr):
-    # Überprüfe, ob die Eingabe den erwarteten Kriterien entspricht
-    if not isinstance(username, str):
-        print(type(username))
-        return False
-    
-    if not isinstance(e_mail, str):
-        print(type(e_mail))
-        return False
-    
-    if not isinstance(firstname, str):
-        return False
-    
-    if not isinstance(lastname, str):
-        return False
-    
-    if not isinstance(password, str):
-        return False
-    
-    if shv_nr is not None:
-        if not isinstance(shv_nr, (int)):
-            return False
-        
-        # Überprüfe, ob die SHV-Nummer eine Zahl mit 6 Ziffern ist
-        shv_nr = str(shv_nr)
-        if not shv_nr.isdigit() or len(shv_nr) != 6:
-            return False
-    
-    # Weitere Validierungsregeln können hier hinzugefügt werden
-    # Zum Beispiel: Überprüfung der E-Mail-Formatierung oder des Passwortmusters
-    
-    return True
-
-
-def verify_password(entered_password, stored_password):
-    if entered_password == stored_password:
-        return True
-    return False
-
-def get_user(Username:str):
-    try:
-        user = session.query(User).filter_by(username=Username).first()
-        return user
-    except:
-        return False
-
-def authenticate_user(username: str, password: str):
-    user = get_user(username)
-    if not user:
-        return False
-    if not verify_password(password, user.password):
-        return False
-    return user
-
-
-def create_access_token(data: dict, expires_delta: timedelta or None = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-
-    to_encode.update({'exp': expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    
-    return encoded_jwt
-
-
-async def get_current_user(token: str = Depends(OAuth_2_scheme)):
-    credential_exeption = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                        detail='Could not validate credentials', headers={'WWW-Authenticate':'Bearer'})
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get('username')
-        print('the payload is:')
-        print(payload)
-        if username is None:
-            raise credential_exeption
-        token_data = TokenData(username=username)
-    except JWTError:
-        raise credential_exeption
-
-    user = get_user(username)
-    if user is None:
-        raise credential_exeption
-    print(user)
-  
-    return user
-
-
-async def get_current_active_user(current_user: User.password = Depends(get_current_user)):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail='Inactive user')
-    return current_user
-#-------------------------------------------------------------------------------------#
 
 
 #----------------------------- define CRUD Endpoints ---------------------------------#
@@ -220,12 +122,9 @@ async def register(username:str, e_mail:str, firstname:str, lastname:str, passwo
             print(f'Integrity Error: {str(e)}')
             raise HTTPException(status_code=500, detail='Internal server error')
 
-
 @app.post('/api/login')
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
-    print(user.username)
-    print(form_data.password)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Could not validate credentials', headers={'WWW-Authenticate':'Bearer'})
@@ -265,7 +164,6 @@ async def upload_igc(current_user: User = Depends(get_current_active_user), file
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,
                             detail='wrongfiletyp')
 
-
 @app.post('/api/edit_flight')
 async def edit_flight(  flight_id:int,
                         flight_name=None,
@@ -274,77 +172,68 @@ async def edit_flight(  flight_id:int,
                         takeoff: str=None,
                         landing: str=None,
                         date: datetime=None,
-                        current_user: User = Depends(get_current_active_user),
-                        files_list: List[Union[UploadFile, str]] = File(None)):
-    # checking if the flight accualy belongs to the logged in user
-    if isinstance(files_list, str):
-        files_list = []
+                        current_user: User = Depends(get_current_active_user)):
     try:
-        user_id = current_user.user_id
-        flight_ids = [flight.flight_id for flight in session.query(Fligth).filter_by(pilot=user_id).all()]
-        if not flight_id in flight_ids:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                detail='not flight of logged in user')
-        else:
-            flight = session.query(Fligth).filter_by(flight_id=flight_id).first()
-            # update all values that are not empty
-            if flight_name != None:
-                flight.flight_name = flight_name
-            if comment !=None:
-                flight.comment = comment
-            if glider != None:
-                flight.glider = glider
-            if takeoff != None:
-                flight.takeoff = takeoff
-            if landing != None:
-                flight.landing = landing
-            if date != None:
-                flight.date = date
+        is_users_flight(current_user.user_id, flight_id)
+        flight = session.query(Fligth).filter_by(flight_id=flight_id).first()
+        # update all values that are not empty
+        if flight_name:
+            flight.flight_name = flight_name
+        if comment:
+            flight.comment = comment
+        if glider:
+            flight.glider = glider
+        if takeoff:
+            flight.takeoff = takeoff
+        if landing:
+            flight.landing = landing
+        if date:
+            flight.date = date
 
-            # if files != None:
-            #     # upload images
-            #     allowed_files = {"image/jpeg", "image/png", "image/gif", "image/tiff", "image/bmp", "video/webm"}
-            #     bad_files = []
-            #     for f in files:
-            #         if f.content_type not in allowed_files:
-            #             bad_files.append(f.filename)
-            #     if len(bad_files) > 0:
-            #         return f'Wrong file types: {bad_files}'
-            #     else:
-            #         for f in files:
-            #             filename = f.filename
-            #             with open(os.path.join('./data/image', filename), 'wb') as buffer:
-            #                 shutil.copyfileobj(f.file, buffer)
-            #         return 'Photos uploaded successfully'
-
-        
-            session.add(flight)
-            session.commit()
-            return "update succesfull"
+        session.add(flight)
+        session.commit()
+        return "update succesfull"
     except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                     detail='error')
 
-
-                    
 # Upload / change Items
-@app.post('/multi_image')
-async def mulit_image(files: list[UploadFile] = File(...), current_user: User = Depends(get_current_active_user)):
-        user_id = current_user.user_id
-        allowed_files = {"image/jpeg", "image/png", "image/gif", "image/tiff", "image/bmp", "video/webm"}
-        bad_files = []
-        for f in files:
-            if f.content_type not in allowed_files:
-                bad_files.append(f.filename)
-        if len(bad_files) > 0:
-            return f'Wrong file types: {bad_files}'
-        else:
+@app.post('/upload_fligth_image')
+async def mulit_image(  flight_id: int,
+                        files: list[UploadFile] = File(...),
+                        current_user: User = Depends(get_current_active_user)):
+    is_users_flight(current_user.user_id, flight_id)
+    allowed_files = {"image/jpeg", "image/png", "image/gif", "image/tiff", "image/bmp", "video/webm"}
+    bad_files = []
+    for f in files:
+        if f.content_type not in allowed_files:
+            bad_files.append(f.filename)
+    if len(bad_files) > 0:
+        return f'Wrong file types: {bad_files}'
+    else:
+        max_images = 5
+        if count_images(flight_id, max_images, len(files)):
             for f in files:
-                filename = f.filename
+                filename = crate_imge_hash(current_user, f.filename)
                 with open(os.path.join('./data/image', filename), 'wb') as buffer:
                     shutil.copyfileobj(f.file, buffer)
+                
             return 'Photos uploaded successfully'
+        raise  HTTPException(status_code=status.HTTP_409_CONFLICT,
+                        detail=f'to mucht photos max = {max_images}')
 
+@app.post('/delete_fligth_image')
+async def delete_image(flight_id: int,
+                        images: List[str],
+                         current_user: User = Depends(get_current_active_user)):
+    is_users_flight(current_user.user_id, flight_id)
+    path = "./data/image/"
+    try:
+        for i in images:
+            os.remove(path+i)
+        return "images removed"
+    except:
+        return "error"
 
 
 #-------------------------------------------------------------------------------------#

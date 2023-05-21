@@ -104,7 +104,7 @@ class Fligth(Base):
     duration = Column("duration", Time, default=None)
     biplace = Column("biplace", String, default=None)
     date = Column("date", Date, default=None)
-    img_link = Column("img_link", String, default=None)
+    img_link = Column("img_link", ARRAY(String), default=None)
     glider = Column("glider", String, default=None)
     wind_kmh = Column("wind_kmh", Integer, default=None)
     temp_celsius = Column("temp_celsius", Integer, default=None)
