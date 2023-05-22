@@ -220,3 +220,13 @@ def create_image_hash(user, filename):
     hash = ''.join(l)
     return hash[0:25]+ending
 
+def feed_json(flights, amount):
+    json = {}
+    c = 1
+    for i in flights:
+        if c < amount:
+            i.to_dict
+            json.update(i.to_dict())
+            c+=1
+    return json
+

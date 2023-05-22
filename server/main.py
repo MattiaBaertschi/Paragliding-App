@@ -1,4 +1,4 @@
-from sqlalchemy import or_, create_engine, ForeignKey, Column, String, Integer, CHAR, Boolean, Sequence, VARCHAR, ARRAY, Float, Date, UniqueConstraint
+from sqlalchemy import or_, create_engine, ForeignKey, Column, String, Integer, CHAR, Boolean, Sequence, VARCHAR, ARRAY, Float, Date, UniqueConstraint, desc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, query
 from sqlalchemy.exc import IntegrityError
@@ -214,6 +214,9 @@ async def edit_flight(  flight_id:int,
 async def mulit_image(  flight_id: int,
                         files: list[UploadFile] = File(...),
                         current_user: User = Depends(get_current_active_user)):
+    #╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼
+    MAXIMAL_AMOUNT_OF_IMAGES_PER_FLIGHT = 5
+    #╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼
     is_users_flight(current_user.user_id, flight_id)
     allowed_files = {"image/jpeg", "image/png", "image/gif", "image/tiff", "image/bmp", "video/webm"}
     bad_files = []
@@ -223,8 +226,7 @@ async def mulit_image(  flight_id: int,
     if len(bad_files) > 0:
         return f'Wrong file types: {bad_files}'
     else:
-        max_images = 5
-        update_image_list(flight_id, max_images, files, current_user)
+        update_image_list(flight_id, MAXIMAL_AMOUNT_OF_IMAGES_PER_FLIGHT, files, current_user)
         return 'Photos uploaded successfully'
 
 
@@ -283,5 +285,51 @@ async def request_follow(   follower_id: int,
 
 
 #====================================================== Display Content ===========================================================#
+
+# --- Display A Specific Flight --- #
+
+@app.get('/api/flight')
+async def get_flight(   flight_id:int,
+                        current_user: User = Depends(get_current_active_user)):
+    is_users_flight(current_user.user_id, flight_id)
+    flight = session.query(Flight).filter_by(flight_id = flight_id).first()
+    data = flight.to_dict()
+    return data
+
+@app.get('/api/feed')
+async def get_feed(current_user: User = Depends(get_current_active_user)):
+    #╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼
+    AMOUNT_OF_DISPLAYED_FLIGHTS = 10
+    #╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼
+    user_ids = (session.query(UserRelation.followed_id)
+                        .filter(UserRelation.follower_id == current_user.user_id,
+                                    UserRelation.acceptet == True)
+                        .all())
+    user_ids = tuple([int(i[0]) for i in user_ids])
+    to_display = user_ids + (current_user.user_id, )
+    print(to_display)
+    flights = (session.query(Flight)
+                    .filter(Flight.pilot.in_(to_display))
+                    .order_by(desc(Flight.upload_date))
+                    .all())
+    return feed_json(flights, AMOUNT_OF_DISPLAYED_FLIGHTS)
+
+@app.get('/api/users_flights')
+async def get_users_flights(current_user: User = Depends(get_current_active_user)):
+    flights = (session.query(Flight)
+                    .filter(Flight.pilot == current_user.user_id)
+                    .order_by(desc(Flight.upload_date))
+                    .all())
+    json = {}
+    for i in flights:
+        i.to_dict
+        json.update(i.to_dict_users_view())
+    return json
+
+@app.get('/api/userprofile')
+async def get_users_flights(current_user: User = Depends(get_current_active_user)):
+    user = session.query(User).filter(User.user_id == current_user.user_id).first()
+    user = user.to_dict()
+    return user
 
 #==================================================================================================================================#

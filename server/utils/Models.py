@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Column, String, Integer, CHAR, Boolean, VARCHAR, ARRAY, Float, Date, UniqueConstraint, Time
+from sqlalchemy import ForeignKey, Column, String, Integer, CHAR, Boolean, VARCHAR, ARRAY, Float, Date, UniqueConstraint, Time, DateTime
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -93,6 +93,7 @@ class Flight(Base):
 
     flight_id = Column("flight_id", Integer, primary_key=True, autoincrement=True)
     pilot = Column(Integer, ForeignKey("users.user_id"))
+    upload_date = Column("upload_date", DateTime)
     flight_name = Column("flight_name", String, default= None)
     comment = Column("comment", VARCHAR, default=None)
     gnss_records = Column("gnss_records", ARRAY(Float), default= None)
@@ -106,14 +107,15 @@ class Flight(Base):
     biplace = Column("biplace", String, default=None)
     date = Column("date", Date, default=None)
     images = Column('images', JSON(String), default=[])
-    #images = Column("images", ARRAY(String), default=[])
     glider = Column("glider", String, default=None)
     wind_kmh = Column("wind_kmh", Integer, default=None)
     temp_celsius = Column("temp_celsius", Integer, default=None)
 
-    def __init__(self, pilot, flight_name=None, comment=None, gnss_records=None,  alt_gnss=None,  terrain=None,  takeoff=None, landing=None,  start_time = None, end_time = None, duration = None, biplace=None, date=None,  images=None,  glider=None,  wind_kmh=None,  temp_celsius=None):
+
+    def __init__(self, pilot, upload_date, flight_name=None, comment=None, gnss_records=None,  alt_gnss=None,  terrain=None,  takeoff=None, landing=None,  start_time = None, end_time = None, duration = None, biplace=None, date=None,  images=None,  glider=None,  wind_kmh=None,  temp_celsius=None):
         self.flight_name = flight_name
         self.pilot = pilot
+        self.upload_date = upload_date
         self.comment = comment
         self.gnss_records = gnss_records
         self.alt_gnss = alt_gnss
@@ -132,8 +134,44 @@ class Flight(Base):
         self.wind_kmh = wind_kmh
         self.temp_celsius = temp_celsius
 
+
+    def to_dict(self):
+        return {
+            "flight_id": self.flight_id,
+            "flight_name": self.flight_name,
+            "upload_date": self.upload_date,
+            "pilot": self.pilot,
+            "comment": self.comment,
+            "gnss_records": self.gnss_records,
+            "alt_gnss": self.alt_gnss,
+            "terrain": self.terrain,
+            "takeoff": self.takeoff,
+            "landing": self.landing,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "duration": self.duration,
+            "biplace": self.biplace,
+            "date": self.date,
+            "images": self.images,
+            "glider": self.glider,
+            "wind_kmh": self.wind_kmh,
+            "temp_celsius": self.temp_celsius
+        }
+    
+    def to_dict_users_view(self):
+        return{
+            "flight_id": self.flight_id,
+            "flight_name": self.flight_name,
+            "upload_date": self.upload_date,
+            "date": self.date,
+            "takeoff": self.takeoff,
+            "landing": self.landing,
+            "duration": self.duration,
+        }
+
     def __repr__(self):
         return f"Flight( {self.flight_name} {self.takeoff} {self.landing} pilot: {self.pilot})"
+
 
 class UserRelation(Base):
     __tablename__ = 'user_relations'
@@ -141,12 +179,12 @@ class UserRelation(Base):
     user_relations_id = Column("user_relations_id", Integer, primary_key=True, autoincrement=True)
     follower_id = Column("follower_id", Integer, ForeignKey("users.user_id"))
     followed_id = Column(Integer, ForeignKey("users.user_id"))
-    acceptet = Column(Boolean)
+    accepted = Column(Boolean)
 
     def __init__ (self, follower_id, followed_id, accepted):
         self.follower_id = follower_id
         self.followed_id = followed_id
-        self.acceptet = acceptet
+        self.accepted = accepted
 
     def __repr__(self):
         return f"{self.followed_id}"

@@ -51,6 +51,7 @@ def handle_igc(file,user_id:int):
                         duration = time_difference,
                         glider =  glider,
                         date = date,
+                        upload_date = datetime.utcnow()
                         )
 
     # reduce coordinates by the defined factor in order to make the API-Request faster
