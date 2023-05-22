@@ -1,4 +1,5 @@
 from sqlalchemy import ForeignKey, Column, String, Integer, CHAR, Boolean, VARCHAR, ARRAY, Float, Date, UniqueConstraint, Time
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy import create_engine
@@ -87,7 +88,7 @@ class User(Base):
     def __repr__(self):
         return str(self.to_dict())
 
-class Fligth(Base):
+class Flight(Base):
     __tablename__ = "flights"
 
     flight_id = Column("flight_id", Integer, primary_key=True, autoincrement=True)
@@ -104,12 +105,13 @@ class Fligth(Base):
     duration = Column("duration", Time, default=None)
     biplace = Column("biplace", String, default=None)
     date = Column("date", Date, default=None)
-    img_link = Column("img_link", ARRAY(String), default=None)
+    images = Column('images', JSON(String), default=[])
+    #images = Column("images", ARRAY(String), default=[])
     glider = Column("glider", String, default=None)
     wind_kmh = Column("wind_kmh", Integer, default=None)
     temp_celsius = Column("temp_celsius", Integer, default=None)
 
-    def __init__(self, pilot, flight_name=None, comment=None, gnss_records=None,  alt_gnss=None,  terrain=None,  takeoff=None, landing=None,  start_time = None, end_time = None, duration = None, biplace=None, date=None,  img_link=None,  glider=None,  wind_kmh=None,  temp_celsius=None):
+    def __init__(self, pilot, flight_name=None, comment=None, gnss_records=None,  alt_gnss=None,  terrain=None,  takeoff=None, landing=None,  start_time = None, end_time = None, duration = None, biplace=None, date=None,  images=None,  glider=None,  wind_kmh=None,  temp_celsius=None):
         self.flight_name = flight_name
         self.pilot = pilot
         self.comment = comment
@@ -125,7 +127,7 @@ class Fligth(Base):
         self.landing = landing
         self.biplace = biplace
         self.date = date
-        self.img_link = img_link
+        self.images = images
         self.glider = glider
         self.wind_kmh = wind_kmh
         self.temp_celsius = temp_celsius
@@ -141,7 +143,7 @@ class UserRelation(Base):
     followed_id = Column(Integer, ForeignKey("users.user_id"))
     acceptet = Column(Boolean)
 
-    def __init__ (self, follower_id, followed_id, acceptet):
+    def __init__ (self, follower_id, followed_id, accepted):
         self.follower_id = follower_id
         self.followed_id = followed_id
         self.acceptet = acceptet

@@ -1,7 +1,9 @@
 import utils.Models
 from utils.functions import *
-print(countimages(1))
-
+# Usage
+flight_id = 1
+new_item = "new_item"
+update_image_list(flight_id, new_item)
 
 
 # def authenticate_user(username: str, password: str):

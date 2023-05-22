@@ -28,28 +28,6 @@ import os
 import json
 
 
-
-#============================= Setup for secure login ================================#
-SECRET_KEY = Creds.LOGIN_KEY
-ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REGISTER_TOKEN_EXPIRE_MINUTES = 10
-
-
-
-OAuth_2_scheme = OAuth2PasswordBearer(tokenUrl='login')
-#=====================================================================================#
-
-
-
-#=================================== initalize Database ==============================#
-Session = sessionmaker(bind=engine)
-session = Session()
-#=====================================================================================#
-
-
-#=================================== FAST API APP ====================================#
-
 app = FastAPI(title='API_NAME',
               description='API_DESC',
               version='0.2.0',
@@ -70,21 +48,11 @@ app.add_middleware(
 templates = Jinja2Templates(directory='./templates')
 
 
-#----------------------------- define CRUD Endpoints ---------------------------------#
 
-#                                   Registration
+#================================================= Registration and Verifycation ==================================================#
 
-@app.get('/api/verify/{register_token}')
-def verify(register_token, request: Request):
-    try:
-        payload = jwt.decode(register_token, SECRET_KEY, algorithms=[ALGORITHM])
-        user = payload.get('username')
-        user_to_update = session.query(User).filter_by(username=user).first()
-        user_to_update.verifyed = True
-        session.commit()
-        return templates.TemplateResponse('verifyed.html', context={'request': request, 'login': Creds.WEBSITE_HOME})
-    except:
-        return templates.TemplateResponse('verifycation_error.html',  context={'request': request, 'homepage': Creds.WEBSITE_LOGIN})
+
+# --- Registration --- #
 
 @app.post('/api/register')
 async def register(username:str, e_mail:str, firstname:str, lastname:str, password: str, shv_nr:int = None):
@@ -94,7 +62,13 @@ async def register(username:str, e_mail:str, firstname:str, lastname:str, passwo
             raise HTTPException(status_code=400, detail='Invalid input')
 
         # Versuche, den neuen Benutzer zur Datenbank hinzuzufügen
-        new_user = User(username=username, e_mail=e_mail, firstname=firstname, lastname=lastname, password=password, shv_nr=shv_nr, verifyed=False, disabled=False)
+        new_user = User(username=username,
+                        e_mail=e_mail, firstname=firstname,
+                        lastname=lastname,
+                        password=password,
+                        shv_nr=shv_nr,
+                        verifyed=False,
+                        disabled=False)
         session.add(new_user)
         session.commit()
 
@@ -122,6 +96,27 @@ async def register(username:str, e_mail:str, firstname:str, lastname:str, passwo
             print(f'Integrity Error: {str(e)}')
             raise HTTPException(status_code=500, detail='Internal server error')
 
+
+# --- Verification --- #
+
+@app.get('/api/verify/{register_token}')
+def verify(register_token, request: Request):
+    try:
+        payload = jwt.decode(register_token, SECRET_KEY, algorithms=[ALGORITHM])
+        user = payload.get('username')
+        user_to_update = session.query(User).filter_by(username=user).first()
+        user_to_update.verifyed = True
+        session.commit()
+        return templates.TemplateResponse('verifyed.html',
+                                            context={'request': request, 'login': Creds.WEBSITE_HOME})
+    except:
+        return templates.TemplateResponse('verifycation_error.html',
+                                            context={'request': request, 'homepage': Creds.WEBSITE_LOGIN})
+#==================================================================================================================================#
+
+
+
+#============================================================= Login ==============================================================#
 @app.post('/api/login')
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
@@ -134,8 +129,11 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data=user.to_dict(), expires_delta = access_token_expires)
     return {'access_token': access_token, 'token_type': 'bearer'}
+#==================================================================================================================================#
 
-# Upload IGC
+
+
+#=========================================================== IGC Upload ===========================================================#
 @app.post('/api/upload_igc')
 async def upload_igc(current_user: User = Depends(get_current_active_user), file: UploadFile = File(...)):
     name, extention = os.path.splitext(file.filename)
@@ -163,7 +161,11 @@ async def upload_igc(current_user: User = Depends(get_current_active_user), file
     else:
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,
                             detail='wrongfiletyp')
+#==================================================================================================================================#
 
+
+
+#===================================================== Edit Flight Attributes =====================================================#
 @app.post('/api/edit_flight')
 async def edit_flight(  flight_id:int,
                         flight_name=None,
@@ -175,7 +177,7 @@ async def edit_flight(  flight_id:int,
                         current_user: User = Depends(get_current_active_user)):
     try:
         is_users_flight(current_user.user_id, flight_id)
-        flight = session.query(Fligth).filter_by(flight_id=flight_id).first()
+        flight = session.query(Flight).filter_by(flight_id=flight_id).first()
         # update all values that are not empty
         if flight_name:
             flight.flight_name = flight_name
@@ -189,6 +191,10 @@ async def edit_flight(  flight_id:int,
             flight.landing = landing
         if date:
             flight.date = date
+        if flight.images:
+            flight.images = flight.images
+        else:
+            flight.images = []
 
         session.add(flight)
         session.commit()
@@ -196,9 +202,15 @@ async def edit_flight(  flight_id:int,
     except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                     detail='error')
+#==================================================================================================================================#
 
-# Upload / change Items
-@app.post('/upload_fligth_image')
+
+#================================================= Upload And Delete Images =======================================================#
+
+
+# --- Uplaod Images --- #
+
+@app.post('/api/upload_flight_image')
 async def mulit_image(  flight_id: int,
                         files: list[UploadFile] = File(...),
                         current_user: User = Depends(get_current_active_user)):
@@ -212,31 +224,64 @@ async def mulit_image(  flight_id: int,
         return f'Wrong file types: {bad_files}'
     else:
         max_images = 5
-        if count_images(flight_id, max_images, len(files)):
-            for f in files:
-                filename = crate_imge_hash(current_user, f.filename)
-                with open(os.path.join('./data/image', filename), 'wb') as buffer:
-                    shutil.copyfileobj(f.file, buffer)
-                
-            return 'Photos uploaded successfully'
-        raise  HTTPException(status_code=status.HTTP_409_CONFLICT,
-                        detail=f'to mucht photos max = {max_images}')
+        update_image_list(flight_id, max_images, files, current_user)
+        return 'Photos uploaded successfully'
 
-@app.post('/delete_fligth_image')
+
+# --- Delete Images --- #
+
+@app.post('/api/delete_flight_image')
 async def delete_image(flight_id: int,
                         images: List[str],
-                         current_user: User = Depends(get_current_active_user)):
+                        current_user: User = Depends(get_current_active_user)):
     is_users_flight(current_user.user_id, flight_id)
     path = "./data/image/"
     try:
         for i in images:
             os.remove(path+i)
+            update_image_list_delete(flight_id, i)
         return "images removed"
     except:
         return "error"
+#==================================================================================================================================#
 
 
-#-------------------------------------------------------------------------------------#
 
-#=====================================================================================#
+#=================================================== Social Network Connection ====================================================#
+@app.post('/api/follow_request')
+async def request_follow(   followed_id: int,
+                            current_user: User = Depends(get_current_active_user)):
+    try:
+        new_relation = UserRelation(current_user.user_id, followed_id, False)
+        session.add(new_relation)
+        session.commit()
+        return "request sent successfully"
+    except:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+            detail=f'error')
 
+
+@app.post('/api/accept_follow_request')
+async def request_follow(   follower_id: int,
+                            current_user: User = Depends(get_current_active_user)):
+    try:
+        relation = session.query(UserRelation).filter_by(follower_id=follower_id, followed_id=current_user.user_id).first()
+
+
+        if relation:
+            relation.accepted = True
+            session.add(relation)
+            session.commit()
+            return "request successfully accepted"
+        else:
+            return "there was no request"
+    except:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+            detail=f'error')
+
+#==================================================================================================================================#
+
+
+#====================================================== Display Content ===========================================================#
+
+#==================================================================================================================================#

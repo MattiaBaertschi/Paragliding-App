@@ -2,6 +2,7 @@ from sqlalchemy import or_, create_engine, ForeignKey, Column, String, Integer, 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, query
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.dialects.postgresql import JSON
 
 from fastapi import Depends, FastAPI, File, UploadFile, Form, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -18,8 +19,9 @@ from datetime import datetime, timedelta
 
 from utils.handle_igc import handle_igc
 from utils.handle_mail import sendmail
-from utils.Models import TokenData, Fligth, User, engine, Base, Creds
+from utils.Models import *
 
+import random
 
 from typing import Optional, List, Any
 
@@ -148,19 +150,73 @@ async def get_current_active_user(current_user: User.password = Depends(get_curr
 
 
 def is_users_flight(user_id, flight_id):
-    flight_ids = [flight.flight_id for flight in session.query(Fligth).filter_by(pilot=user_id).all()]
+    flight_ids = [flight.flight_id for flight in session.query(Flight).filter_by(pilot=user_id).all()]
     if not flight_id in flight_ids:
         raise  HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail='not flight of logged in user')
 
 def count_images(flight_id, max_images, len_to_upload):
-    images = session.query(Fligth.img_link).filter_by(flight_id=flight_id).all()
-    image_list = [image for sublist in images for image in sublist[0]] # already uploaded photos
-    if len(image_list)+len_to_upload > max_images+1:
-        return False
-    return True
+    images = session.query(Flight.img_link).filter_by(flight_id=flight_id).all()
 
-def crate_imge_hash(user, filename):
-    to_encode = user.to_dict.update({'filename':filename})
-    hash = jwt.encode(to_encode, Creds.MAIL_KEY)
-    return hash
+
+# def update_image_list(flight_id, new_image:str, max_images):
+#     flight = session.query(Flight).filter_by(flight_id=flight_id).first()
+#     if flight:
+#         if len(flight.img_link) < max_images:
+#             image_list = flight.img_link  # Get the image list
+#             image_list.append(new_image)  # Append the new item
+#             new_list = image_list.copy()
+#             flight.img_link = list(new_list)
+#             print(new_list)
+#             print(type(new_list))
+#             session.add(flight)
+#             session.commit()  # Commit the changes to the database
+#         else:
+#             raise  HTTPException(status_code=status.HTTP_409_CONFLICT,
+#                                 detail='maximum image uploads of {max_images} reached')
+
+def update_image_list(flight_id:int, max_images:int, files, user):
+    for f in files:
+        filename = create_image_hash(user, f.filename)
+        flight = session.query(Flight).filter_by(flight_id=flight_id).first()
+        if len(flight.images) < max_images:
+            new_images = flight.images + [filename]  # Create a new list with the appended image
+            flight.images = new_images
+            session.add(flight)
+            session.commit()  # Commit the changes to the database
+            session.rollback()
+            with open(os.path.join('./data/image', filename), 'wb') as buffer:
+                shutil.copyfileobj(f.file, buffer)
+        else:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                                 detail=f'max upload reached')
+
+def update_image_list_delete(flight_id:int, imagename: str):
+    flight = session.query(Flight).filter_by(flight_id=flight_id).first()
+    if len(flight.images)>0:
+        l = []
+        for i in flight.images:
+            if i != imagename:
+                l.append(i)
+        print(l)
+        flight.images = l
+        session.add(flight)
+        session.commit()  # Commit the changes to the database
+    else:
+        session.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                    detail=f'no images found')
+    
+    
+def create_image_hash(user, filename):
+    ending = '.'+filename.split('.')[-1]
+    date = datetime.utcnow()
+    to_encode = user.to_dict()
+    to_encode.update({'filename': filename})
+    #to_encode.update({'date': date})
+    hash = jwt.encode(to_encode, Creds.MAIL_KEY, algorithm=ALGORITHM)
+    l = list(hash)
+    random.shuffle(l)
+    hash = ''.join(l)
+    return hash[0:25]+ending
+

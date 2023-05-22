@@ -1,5 +1,5 @@
 from utils.aero import Reader
-from utils.Models import Fligth
+from utils.Models import Flight
 
 from datetime import datetime
 import json
@@ -42,7 +42,7 @@ def handle_igc(file,user_id:int):
     time_difference = datetime2 - datetime1
 
     # Add all Parameters to the new flight
-    new_flight = Fligth(pilot=user_id,
+    new_flight = Flight(pilot=user_id,
                         gnss_records = coord,
                         alt_gnss = alt_gnss,
                         takeoff = takeoff,
