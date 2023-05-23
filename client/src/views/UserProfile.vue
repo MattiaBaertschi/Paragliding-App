@@ -2,7 +2,8 @@
     <div class="flex flex-col items-center">
     <img src="https://www.shutterstock.com/image-vector/cheerful-gray-cat-enjoys-paragliding-260nw-1981432805.jpg" alt="Profilbild" class="w-32 h-32 rounded-full mb-4">
 
-    <h2 class="text-xl mb-4 font-bold text-gray-800 mb-2">{{ sessionStore.username }}</h2>
+    <h2 class="text-xl mb-2 font-bold text-gray-800">{{ userdata.firstname }} {{ userdata.lastname }}</h2>
+    <p>@{{ userdata.username }}</p>
     <p v-if="sessionStore.sessionToken != null" class="text-xs mb-2">Token vorhanden</p>
 
     <div class="flex mb-4 gap-x-2">
@@ -75,14 +76,50 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, onMounted } from "vue";
 import UserLineChart from "@/components/UserLineChart.vue";
 import { useSessionStore } from '@/store/user';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
   
+
+const url = 'https://hoemknoebi.internet-box.ch/api/userprofile';
+
+
+
+const userdata = ref({
+  "user_id": 1,
+  "username": "nix",
+  "e_mail": "nix@keinemail.no",
+  "firstname": "Nobody",
+  "lastname": "Noes",
+  "password": "cumulus1234",
+  "shv_nr": 12345,
+  "verifyed": true,
+  "disabled": false});
+
+const fetchData = async () => {
+  try {
+    const response = await axios.get(url,header);
+    // Speichern Sie die Antwortdaten in Ihrer ref
+    userdata.value = response.data;
+    console.log(userdata.value)
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+onMounted(fetchData);
+
 const router = useRouter();
 const sessionStore = useSessionStore();
+const token = sessionStore.sessionToken;
 
+const header = {
+  headers: {
+    'Authorization': `Bearer ${token}`
+  }
+};
 
 const updateKey = ref(0)
 const chartTimeFrame = ref("all");

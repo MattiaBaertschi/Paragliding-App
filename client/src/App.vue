@@ -40,7 +40,7 @@
 
     if (sessionStore.username == null){
     //Auskommentieren damit Login Seite kommt wenn keine Benutzer angemeldet ist.
-    //router.push('/login');
+    router.push('/login');
     }
     else {
       showHeaderAndNav.value = true;

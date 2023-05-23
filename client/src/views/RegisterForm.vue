@@ -94,6 +94,7 @@
   const v$ = useVuelidate(rules, formData)
   
   async function handleRegister() {
+    console.log("Register Start")
     const result = v$.value.$validate();
     if (result){
       try {
@@ -108,6 +109,7 @@
     else{
       alert("Error, Form not filled correctly")
     }
+    console.log("Register Ends")
   }
   </script>
   

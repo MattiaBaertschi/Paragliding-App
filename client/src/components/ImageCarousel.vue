@@ -1,6 +1,6 @@
 <template>
-    <carousel :items-to-show="1" :autoplay="5000" :wrap-around="true" class="mb-2">
-      <slide :key="'map'"><MapComponent/></slide>
+    <carousel :items-to-show="1" :wrap-around="true" class="mb-2">
+      <slide :key="'map'"><MapComponent :flightPath="gnss_records"/></slide>
       <slide v-for="image in images" :key="Slide">
         <img
         :src="image"
@@ -22,6 +22,14 @@ import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import MapComponent from "@/components/MapComponent.vue";
 
+const props = defineProps({
+  gnss_records: { 
+    type: Array,
+    default: [
+  [46.376067, 8.02655],
+  [46.376067, 8.026633]
+]}})
+
 const images = [
   "https://placekitten.com/640/200",
   "https://placekitten.com/550/350",
@@ -29,6 +37,8 @@ const images = [
   "https://placekitten.com/600/320",
   "https://placekitten.com/620/320"
 ];
+
+
 
 
 defineExpose({

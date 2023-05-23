@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white rounded-lg shadow-md overflow-hidden my-8">
     <div class="relative">
-      <ImageCarousel/>
+      <ImageCarousel :gnss_records="flight.gnss_records"/>
       <!--
       <MapComponent v-show="currentImage === -1" :flightPath="flight.polyline" />
       <div v-show="currentImage === -1" class="absolute top-2 left-2 px-3 py-1 bg-white text-dark font-semibold rounded-lg text-sm tracking-wider">{{ flight.date }}</div>

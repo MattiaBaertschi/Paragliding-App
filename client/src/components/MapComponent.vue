@@ -37,7 +37,7 @@ const stop_coordinate = flightPathWebMecator.value[flightPathWebMecator.value.le
 //const stop_coordinate = computed(()=> flightPathWebMecator.value[flightPathWebMecator.value.length -1])
 
 function toWebMercator(coord) {
-  const [lat, lon] = coord;
+  const [lon, lat] = coord;
   const r_major = 6378137.0; // Equatorial radius in meters
   const x = r_major * (Math.PI * lon / 180);
   const scale = x / lon;
