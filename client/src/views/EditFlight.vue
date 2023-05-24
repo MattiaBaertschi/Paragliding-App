@@ -7,7 +7,6 @@
       <input-component label="Flugzeit" v-model="currentFlight.data.duration" />
       <input-component label="Gleitschirm" v-model="currentFlight.data.glider" />
       <input-component label="Kommentar" v-model="currentFlight.data.comment" />
-      <div>Der eingegebene Wert ist: {{ currentFlight.data.comment }}</div>
       
         <!-- <label class="block text-sm font-medium text-gray-700">Bilder</label>
         <div v-for="(image, index) in currentFlight.data.images" :key="index">
@@ -15,22 +14,26 @@
           <button @click="deleteImage(index)" class="p-1 text-red-600">Bild löschen</button>
         </div> -->
 
-        <div>
-          <label class="font-semibold tracking-wider mb-2 mt-4">Bilder</label>
-          <div v-for="(image, index) in currentFlight.data.images" :key="index" class="flex">
+      <button @click="updateFlight()" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 my-8 text-white bg-black rounded">Daten aktualisieren</button>
+    </div>
+    <div class="flex flex-col p-4 bg-white rounded-xl space-y-2 mt-4 w-full">
+      <div>
+          <label class="font-semibold tracking-wider mb-4 mt-4">Bilder</label>
+          <div class="flex gap-2 my-4">
+          <div v-for="(image, index) in currentFlight.data.images" :key="index" class="">
             <img :src="`${imageURL}/${image}`" 
-                :class="{ 'border-4 border-blue-500': isSelected(image) }" 
+                :class="{ 'border-4 border-red-600': isSelected(image) }" 
                 alt="Flugbild" 
-                class="w-20 h-20" 
+                class="w-24 h-20" 
                 @click="selectImage(image)"/>
           </div>
-          <button @click="deleteImages" class="p-1 text-red-600">Bilder löschen</button>
         </div>
-      <div>
-        <input type="file" multiple @change="uploadImages" />
-        <button @click="submitImages" class="p-1 text-red-600">Bilder hochladen</button>
+          <button @click="deleteImages" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 mt-2text-black bg-light rounded w-full">Bilder löschen</button>
+        </div>
+        <div class="pt-8">
+          <input type="file" multiple @change="uploadImages" ref="fileInput"/>
+        <button @click="submitImages" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 mt-4 text-white bg-black rounded w-full">Bilder hochladen</button>
       </div>
-      <button @click="updateFlight()" class="px-4 py-2 my-8 text-white bg-black rounded">Daten aktualisieren</button>
     </div>
   </template>
   
@@ -40,17 +43,27 @@ import { useRoute } from 'vue-router';
 import InputComponent from "@/components/InputComponent.vue"
 import { apiGet, apiPost } from '@/utils/api';
 import { useSessionStore } from '@/store/user';
+import ButtonComponent from "@/components/ButtonComponent.vue";
 
 const token = useSessionStore().sessionToken;
 const imageURL = "https://hoemknoebi.internet-box.ch/image"
 const images = ref(null);
 
+
+let isUpdating = ref(false);
+
+
 onMounted(async () => {
-  currentFlight.data = await apiGet('flight_edit', { flight_id: id }, token);
+  fetchData()
   loaded.value = true
 })
 
+async function fetchData() {
+  currentFlight.data = await apiGet('flight_edit', { flight_id: id }, token);
+}
+
 async function updateFlight() {
+  isUpdating.value = true;
   const flightData = {
     flight_id: id,
     flight_name: currentFlight.data.flight_name,
@@ -58,13 +71,18 @@ async function updateFlight() {
     glider: currentFlight.data.glider,
     takeoff: currentFlight.data.takeoff,
     landing: currentFlight.data.landing,
-    //date: currentFlight.data.date
+    date: currentFlight.data.date
   };
   try {
     const response = await apiPost('edit_flight', flightData, token);
     console.log("Daten erfolgreich aktualisiert", response);
-  } catch(error) {
+  } 
+  catch(error) {
     console.log(error);
+  }
+  finally{
+    fetchData()
+    isUpdating.value = false;
   }
 }
 
@@ -79,13 +97,15 @@ const selectImage = (image) => {
   const index = selectedImages.value.indexOf(image);
   if(index === -1){
     selectedImages.value.push(image);
-  }else{
+  }
+  else{
     selectedImages.value.splice(index, 1);
   }
 };
 
 async function deleteImages () {
   if(selectedImages.value.length > 0){
+    isUpdating.value = true;
     console.log("bilder zum löschen", selectedImages.value)
     const postData = toRaw(selectedImages.value)
     console.log("bilder zum löschen:", postData)
@@ -96,7 +116,11 @@ async function deleteImages () {
     catch(error){
       console.log(error)
     }
+    finally{
+      fetchData()
+      isUpdating.value = false;
     }
+  }
 };
 
 const isSelected = (image) => {
@@ -108,6 +132,7 @@ const uploadImages = (event) => {
 };
 
 const submitImages = async () => {
+  isUpdating.value = true
   const formData = new FormData();
   
   for (let i = 0; i < images.value.length; i++) {
@@ -116,9 +141,14 @@ const submitImages = async () => {
 
   try {
     await apiPost('upload_flight_image', flightData, token, formData);
-  } catch (error) {
+  } 
+  catch (error) {
     console.error(error);
   }
+  finally{
+    fetchData()
+    isUpdating.value = false;
+    }
 };
 
 </script>

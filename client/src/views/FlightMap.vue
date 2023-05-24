@@ -114,8 +114,14 @@ console.log(getColorShade(1,500,499))
     />
     <ol-zoom-control/>
     <ol-fullscreen-control/>
+
+    <!-- <ol-tile-layer>
+      <ol-source-osm />
+  </ol-tile-layer> -->
+
     <ol-tile-layer>
-      <ol-source-xyz url="https://stamen-tiles-c.a.ssl.fastly.net/terrain/{z}/{x}/{y}@2x.png" />
+      <ol-source-xyz url="http://{1-4}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png" />
+      <!-- <ol-source-xyz url="https://stamen-tiles-c.a.ssl.fastly.net/terrain/{z}/{x}/{y}@2x.png" />  -->
     </ol-tile-layer>
 
 
@@ -140,7 +146,7 @@ console.log(getColorShade(1,500,499))
       /> -->
       <ol-source-vector
         ref="cities"
-        url="http://localhost:5173/src/data/hexagon_swiss_10km_wgs84_reform.geojson"
+        url="http://localhost:5173/src/data/hexagon_swiss_12km_wgs84_reform.geojson"
         :format="geoJson"
         :projection="projection"
       />

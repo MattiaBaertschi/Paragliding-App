@@ -1,7 +1,7 @@
 import json
 
 # Lesen Sie das ursprüngliche GeoJSON
-with open('hexagon_swiss_10km_wgs84.geojson') as f:
+with open('hexagon_swiss_12km_wgs84.geojson') as f:
     data = json.load(f)
 
 # Erstellen Sie ein neues GeoJSON-Format
