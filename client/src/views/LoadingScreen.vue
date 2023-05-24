@@ -14,7 +14,7 @@ const router = useRouter();
 
 setTimeout(() => {
   router.push('/login');
-}, 3000);
+}, 300);
 
 </script>
 

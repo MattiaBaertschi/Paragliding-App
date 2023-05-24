@@ -1,37 +1,24 @@
 <script setup>
-import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import FlightCard from "@/components/FlightCard.vue"
-import { useSessionStore } from "@/store/user";
+import LoadingComponent from "@/components/LoadingComponent.vue"
+import { apiGet } from '@/utils/api';
+import { useSessionStore } from '@/store/user';
+const token = useSessionStore().sessionToken;
 
-const url = 'https://hoemknoebi.internet-box.ch/api/users_flights';
-
-const sessionStore = useSessionStore();
-const token = sessionStore.sessionToken;
-console.log("token", token);
-const header = {
-  headers: {
-    'Authorization': `Bearer ${token}`
-  }
-};
-
+var loaded = ref(false)
 const data = ref(null);
 
-const fetchData = async () => {
-  try {
-    const response = await axios.get(url,header);
-    data.value = response.data;
-    console.log(data.value)
-  } catch (error) {
-    console.error(error);
-  }
-};
+onMounted(async () => {
+  data.value = await apiGet('users_flights', null , token);
+  loaded.value = true
+})
 
-onMounted(fetchData);
 </script>
 
 <template>
-  <div>
+  <LoadingComponent v-if="loaded == false" />
+  <div v-if="loaded == true">
     <RouterLink to="upload">
       <div class="bg-white rounded-lg shadow-md overflow-hidden my-4 hover:bg-black hover:text-white">
         <div class="p-2 text-center">
@@ -40,10 +27,8 @@ onMounted(fetchData);
         </div>
       </div>
     </RouterLink>
-    <p>sälüj</p>
     <div v-for="(flight, index) in data" :key="index">
       <RouterLink :to="`flights/view/${ flight.flight_id }`">
-        <p>Data: {{ flight }}</p>
         <FlightCard :flight="flight" />
       </RouterLink>
     </div>

@@ -18,9 +18,10 @@ export async function apiGet(endpoint, params, token) {
   }
 }
 
-export async function apiPost(endpoint, data, token) {
+export async function apiPost(endpoint, data, token, body) {
   try {
-    const response = await axios.post(`${API_URL}${endpoint}`, data, {
+    const response = await axios.post(`${API_URL}${endpoint}`, body, {
+        params: data,
         headers: {'Authorization': `Bearer ${token}`},
     });
     return response.data;

@@ -132,9 +132,15 @@ console.log(getColorShade(1,500,499))
     </ol-interaction-select>
 
     <ol-vector-layer>
-      <ol-source-vector
+      <!-- <ol-source-vector
         ref="cities"
         url="http://localhost:5173/src/data/regions.json"
+        :format="geoJson"
+        :projection="projection"
+      /> -->
+      <ol-source-vector
+        ref="cities"
+        url="http://localhost:5173/src/data/hexagon_swiss_10km_wgs84_reform.geojson"
         :format="geoJson"
         :projection="projection"
       />

@@ -8,26 +8,42 @@
       <input-component label="Gleitschirm" v-model="currentFlight.data.glider" />
       <input-component label="Kommentar" v-model="currentFlight.data.comment" />
       <div>Der eingegebene Wert ist: {{ currentFlight.data.comment }}</div>
-      <!-- <div>
-        <label class="block text-sm font-medium text-gray-700">Bilder</label>
-        <div v-for="(image, index) in flightData.images" :key="index">
-          <img :src="image" alt="" class="w-20 h-20"/>
+      
+        <!-- <label class="block text-sm font-medium text-gray-700">Bilder</label>
+        <div v-for="(image, index) in currentFlight.data.images" :key="index">
+          <img :src="`${imageURL}/${image}`" alt="Flugbild" class="w-20 h-20"/>
           <button @click="deleteImage(index)" class="p-1 text-red-600">Bild löschen</button>
+        </div> -->
+
+        <div>
+          <label class="font-semibold tracking-wider mb-2 mt-4">Bilder</label>
+          <div v-for="(image, index) in currentFlight.data.images" :key="index" class="flex">
+            <img :src="`${imageURL}/${image}`" 
+                :class="{ 'border-4 border-blue-500': isSelected(image) }" 
+                alt="Flugbild" 
+                class="w-20 h-20" 
+                @click="selectImage(image)"/>
+          </div>
+          <button @click="deleteImages" class="p-1 text-red-600">Bilder löschen</button>
         </div>
-        <input type="file" @change="uploadImage" class="mt-2 mb-4"/>
-      </div> -->
-  
+      <div>
+        <input type="file" multiple @change="uploadImages" />
+        <button @click="submitImages" class="p-1 text-red-600">Bilder hochladen</button>
+      </div>
       <button @click="updateFlight()" class="px-4 py-2 my-8 text-white bg-black rounded">Daten aktualisieren</button>
     </div>
   </template>
   
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, toRaw } from 'vue';
 import { useRoute } from 'vue-router';
 import InputComponent from "@/components/InputComponent.vue"
 import { apiGet, apiPost } from '@/utils/api';
 import { useSessionStore } from '@/store/user';
+
 const token = useSessionStore().sessionToken;
+const imageURL = "https://hoemknoebi.internet-box.ch/image"
+const images = ref(null);
 
 onMounted(async () => {
   currentFlight.data = await apiGet('flight_edit', { flight_id: id }, token);
@@ -36,12 +52,13 @@ onMounted(async () => {
 
 async function updateFlight() {
   const flightData = {
+    flight_id: id,
     flight_name: currentFlight.data.flight_name,
     comment: currentFlight.data.comment,
     glider: currentFlight.data.glider,
     takeoff: currentFlight.data.takeoff,
     landing: currentFlight.data.landing,
-    date: currentFlight.data.date
+    //date: currentFlight.data.date
   };
   try {
     const response = await apiPost('edit_flight', flightData, token);
@@ -55,6 +72,54 @@ var loaded = ref(false)
 const route = useRoute();  
 const id = route.params.id;
 var currentFlight = reactive({ data: []})
+const flightData = {flight_id: id};
+
+const selectedImages = ref([]);
+const selectImage = (image) => {
+  const index = selectedImages.value.indexOf(image);
+  if(index === -1){
+    selectedImages.value.push(image);
+  }else{
+    selectedImages.value.splice(index, 1);
+  }
+};
+
+async function deleteImages () {
+  if(selectedImages.value.length > 0){
+    console.log("bilder zum löschen", selectedImages.value)
+    const postData = toRaw(selectedImages.value)
+    console.log("bilder zum löschen:", postData)
+    try {
+      const response = await apiPost("delete_flight_image", flightData , token, postData)
+      console.log(response)
+    }
+    catch(error){
+      console.log(error)
+    }
+    }
+};
+
+const isSelected = (image) => {
+  return selectedImages.value.includes(image);
+};
+
+const uploadImages = (event) => {
+  images.value = event.target.files;
+};
+
+const submitImages = async () => {
+  const formData = new FormData();
+  
+  for (let i = 0; i < images.value.length; i++) {
+    formData.append('files', images.value[i]);
+  }
+
+  try {
+    await apiPost('upload_flight_image', flightData, token, formData);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 </script>
   
