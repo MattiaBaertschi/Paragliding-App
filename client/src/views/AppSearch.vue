@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-2xl mb-4 bg-white p-4 text-lg rounded-xl">Suche nach <select v-model="searchType">
+    <div class="mb-4 bg-white p-4 text-lg rounded-xl">Suche nach <select v-model="searchType">
         <option value="all">Flügen & Buddys</option>
         <option value="flights">Flügen</option>
         <option value="users">Buddys</option>
@@ -24,8 +24,8 @@
     <div v-if="searchType === 'all' || searchType === 'flights'">
       <h3 class="text-base font-bold uppercase tracking-widest mt-8 text-black">Flüge:</h3>
       <ul>
-        <li v-for="flight in filteredFlights" :key="flight.id">
-          <RouterLink :to="`flights/view/${ flight.id }`">
+        <li v-for="flight in filteredFlights" :key="flight.flight_id">
+          <RouterLink :to="`flights/view/${ flight.flight_id }`">
           <FlightCard :flight="flight" />
           </RouterLink>
         </li>
@@ -35,8 +35,10 @@
     <div v-if="searchType === 'all' || searchType === 'users'">
       <h3 class="text-base font-bold uppercase tracking-widest mt-8 text-black">Buddys:</h3>
       <ul>
-        <li v-for="user in filteredUsers" :key="user.id">
-          <UserCard :user="user" />
+        <li v-for="user in filteredUsers" :key="user.user_id">
+          <RouterLink :to="`buddy/${ user.user_id }`">
+            <UserCard :user="user" />
+        </RouterLink>
         </li>
       </ul>
     </div>
@@ -45,63 +47,53 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import FlightCard from "@/components/FlightCard.vue"
 import UserCard from "@/components/UserCard.vue"
+import { apiGet } from '@/utils/api';
+import { useSessionStore } from '@/store/user';
+const token = useSessionStore().sessionToken;
+const loading = ref(true);
+var flights = reactive({});
 
-const flights = {
-  "flug_1": {
-    "id": 1,
-    "flight_name": "MetschStand-Rotenbach",
-    "datum": "04. Juni 2022",
-    "startplatz": "Biel Kinizie",
-    "landeplatz": "Ligerz",
-    "flighttime" : "01:24"
-  },
-  "flug_2": {
-    "id": 2,
-    "flight_name": "MetschStand-Rotenbach",
-    "datum": "04. Juni 2022",
-    "startplatz": "Metsch",
-    "landeplatz": "Rothenbach",
-    "flighttime" : "00:10"
-  },
-};
+var users = reactive({});
 
-const users = {
-  "benutzer_1": {
-    "id": 1,
-    "user_name": "flying Bear",
-  },
-  "benutzer_2": {
-    "id": 2,
-    "user_name": "Papagei",
-  }
-}
-
-
+onMounted(async () => {
+  const newFlights = await apiGet('get_all_flights', null , token);
+  Object.assign(flights, newFlights);
+  const newUsers = await apiGet('get_all_users', null , token);
+  Object.assign(users, newUsers);
+  loading.value = false;
+})
 
 const searchQuery = ref('');
-const flightList = Object.values(flights);
-const userList = Object.values(users);
+const flightList = computed(() => Object.values(flights));
+const userList = computed(() => Object.values(users));
 const searchType = ref('all');
 const searchUser = ref('all');
 const searchDate_start = ref("2017-06-01");
 const searchDate_end = ref("2024-06-01");
 
+function matchesSearchQuery(objProperty) {
+  return (objProperty?.toLowerCase() || '').includes(searchQuery.value.toLowerCase())
+}
+
 const filteredFlights = computed(() => {
-  return flightList.filter(flight =>
-    flight.flight_name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    flight.datum.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    flight.startplatz.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    flight.landeplatz.toLowerCase().includes(searchQuery.value.toLowerCase())
+  if (loading.value) return [];
+  return flightList.value.filter(flight =>
+    matchesSearchQuery(flight.flight_name) ||
+    matchesSearchQuery(flight.takeoff) ||
+    matchesSearchQuery(flight.landing) ||
+    matchesSearchQuery(flight.username)
   );
 });
 
 const filteredUsers = computed(() => {
-  return userList.filter(user =>
-    user.user_name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  if (loading.value) return [];
+  return userList.value.filter(user =>
+    matchesSearchQuery(user.user_name) ||
+    matchesSearchQuery(user.firstname) ||
+    matchesSearchQuery(user.lastname)
   );
 });
-
 </script>

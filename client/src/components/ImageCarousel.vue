@@ -20,7 +20,7 @@
 import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import MapComponent from "@/components/MapComponent.vue";
-const imageURL = "https://hoemknoebi.internet-box.ch/image"
+const imageURL = "https://hoemknoebi.internet-box.ch/images/flight_images"
 const props = defineProps({
   gnss_records: { 
     type: Array,

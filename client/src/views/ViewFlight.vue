@@ -34,7 +34,7 @@ const timeStamps = computed(() => currentFlight.data.terrain.map(record => {
 const aboveGround = computed(() => currentFlight.data.alt_gnss.map(record => record[0]));
 const aboveSeaLevel = computed(() => currentFlight.data.terrain.map(record => record[0]));
 onMounted(async () => {
-  currentFlight.data = await apiGet('flight', { flight_id: id }, token);
+  currentFlight.data = await apiGet('get_flight_detail', { flight_id: id }, token);
   loaded.value = true
 })
 

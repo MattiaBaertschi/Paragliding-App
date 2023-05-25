@@ -38,9 +38,9 @@
       showHeaderAndNav.value = false;
     }
 
-    if (sessionStore.username == null){
+    if (sessionStore.username == null && newPath != "/register" ){
     //Auskommentieren damit Login Seite kommt wenn keine Benutzer angemeldet ist.
-    router.push('/login');
+    //router.push('/login');
     }
     else {
       showHeaderAndNav.value = true;

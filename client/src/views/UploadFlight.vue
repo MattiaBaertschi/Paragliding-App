@@ -31,6 +31,9 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { useSessionStore } from "@/store/user";
+import { routerKey } from 'vue-router';
+import { useRouter } from 'vue-router';
+
 
 export default {
   setup() {
@@ -38,6 +41,7 @@ export default {
     const file = ref(null);
     const sessionStore = useSessionStore()
     const token = sessionStore.sessionToken
+    const router = useRouter();
     console.log("token",token)
     const errorActive = ref(false)
 
@@ -72,7 +76,9 @@ export default {
           }
         });
         errorActive.value = false    
-        console.log('SUCCESS!!', response);
+        console.log('SUCCESS!!', response.data);
+        router.push(`/flights/edit/${response.data}`)
+        
         } 
         catch (error) {
           console.log('FAILURE!!', error);

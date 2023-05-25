@@ -35,6 +35,9 @@
         <button @click="submitImages" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 mt-4 text-white bg-black rounded w-full">Bilder hochladen</button>
       </div>
     </div>
+    <RouterLink :to="`/flights/view/${ id }`">
+        Flug ansehen
+      </RouterLink>
   </template>
   
 <script setup>
@@ -46,7 +49,7 @@ import { useSessionStore } from '@/store/user';
 import ButtonComponent from "@/components/ButtonComponent.vue";
 
 const token = useSessionStore().sessionToken;
-const imageURL = "https://hoemknoebi.internet-box.ch/image"
+const imageURL = "https://hoemknoebi.internet-box.ch/images/flight_images"
 const images = ref(null);
 
 
@@ -59,7 +62,7 @@ onMounted(async () => {
 })
 
 async function fetchData() {
-  currentFlight.data = await apiGet('flight_edit', { flight_id: id }, token);
+  currentFlight.data = await apiGet('get_flight_edit', { flight_id: id }, token);
 }
 
 async function updateFlight() {
