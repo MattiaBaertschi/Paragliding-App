@@ -67,34 +67,39 @@ const deleteFlight = async () => {
 
 
 <template>
+<div>
     <div v-if="loaded == false" class="h-full w-full bg-red-700"></div>
     <span class="hidden">{{ currentFlight.data }}</span>
     <div v-if="loaded == true">
     <div v-if="mapIsExpanded == false">
       <ImageCarousel :gnss_records="currentFlight.data.gnss_records" :images="currentFlight.data.images"/>
 
-      <div class="bg-white p-4 rounded-xl my-4">
         <div class="text-2xl mb-4 tracking-wider font-bold">{{ currentFlight.data.flight_name }}</div>
-        <div class="flex">
+      <div class="bg-white p-4 rounded-xl my-4">
+        <div class="flex mb-4">
           <img :src="user" alt="Cloudys" class="w-6 h-6 mr-2">
-          <div class="text-xl mb-4">{{ currentFlight.data.user_id }} Rüedel??</div>
+          <div class="text-xl">{{ currentFlight.data.username }}</div>
         </div>
-        <div class="flex">
+        <div class="flex mb-4">
           <img :src="takeoff" alt="Cloudys" class="w-6 h-6 mr-2">
-          <div class="text-xl mb-4">{{ currentFlight.data.takeoff }}</div>
+          <div class="text-xl">{{ currentFlight.data.takeoff }}</div>
         </div>
-        <div class="flex">
+        <div class="flex mb-4">
           <img :src="landing" alt="Cloudys" class="w-6 h-6 mr-2">
-          <div class="text-xl mb-4">{{ currentFlight.data.landing }}</div>
+          <div class="text-xl">{{ currentFlight.data.landing }}</div>
         </div>
-        <div class="flex">
+        <div class="flex mb-4">
           <img :src="date" alt="Cloudys" class="w-6 h-6 mr-2">
-          <div class="text-xl mb-4">{{ currentFlight.data.date }}</div>
+          <div class="text-xl">{{ currentFlight.data.date }}</div>
         </div>
         <div class="flex">
         <img :src="stopwatch" alt="Cloudys" class="w-6 h-6 mr-2">
         <div class="text-xl">{{ currentFlight.data.duration }}</div>
         </div>
+      </div>
+      <div v-show="currentFlight.data.comment != null" class="bg-white p-4 rounded-xl my-4">
+        <p class="font-semibold text-sm tracking-wider">Kommentar</p>
+        <p>{{ currentFlight.data.comment }}</p>
       </div>
       <div class="mb-4">
         <RouterLink :to="`edit/${ currentFlight.data.id }`"></RouterLink>
@@ -113,5 +118,5 @@ const deleteFlight = async () => {
     <h2 class="text-center text-xl mb-4">Statistik</h2>
     <div><LineChart v-if="loaded == true" :dataLabel="timeStamps" :data1="aboveGround" :data2="aboveSeaLevel"/></div>
   </div>
-
+</div>
 </template>
