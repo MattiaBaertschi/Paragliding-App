@@ -59,9 +59,9 @@ var flights = reactive({});
 var users = reactive({});
 
 onMounted(async () => {
-  const newFlights = await apiGet('get_all_flights', null , token);
+  const newFlights = await apiGet('display_all_flights', null , token);
   Object.assign(flights, newFlights);
-  const newUsers = await apiGet('get_all_users', null , token);
+  const newUsers = await apiGet('display_all_users', null , token);
   Object.assign(users, newUsers);
   loading.value = false;
 })

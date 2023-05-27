@@ -39,7 +39,7 @@ const timeStamps = computed(() => currentFlight.data.terrain.map(record => {
 const aboveGround = computed(() => currentFlight.data.alt_gnss.map(record => record[0]));
 const aboveSeaLevel = computed(() => currentFlight.data.terrain.map(record => record[0]));
 onMounted(async () => {
-  currentFlight.data = await apiGet('get_flight_detail', { flight_id: id }, token);
+  currentFlight.data = await apiGet('get_flight_detail_of_followed', { flight_id: id }, token);
   loaded.value = true
 })
 
@@ -104,11 +104,6 @@ const deleteFlight = async () => {
       <div v-show="currentFlight.data.comment != null" class="bg-white p-4 rounded-xl my-4">
         <p class="font-semibold text-sm tracking-wider">Kommentar</p>
         <p>{{ currentFlight.data.comment }}</p>
-      </div>
-      <div class="mb-4">
-        <RouterLink :to="`edit/${ currentFlight.data.id }`"></RouterLink>
-        <ButtonComponent text="Flug bearbeiten" :path="`../edit/${ id }`" :icon="edit" />
-      <ButtonComponent text="Löschen" @click="deleteFlight" path="" :icon="remove" />
       </div>
     </div>
 

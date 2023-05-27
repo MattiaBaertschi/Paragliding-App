@@ -17,17 +17,17 @@
             <span class="text-sm font-semibold tracking-wider">Flüge</span>
         </div>
         <div class="w-1/3 flex flex-col text-center gap-y-1">
-            <span class="text-4xl text-bold">45:12</span>
-            <span class="text-sm font-semibold tracking-wider">Flugzeit</span>
+            <span class="text-4xl text-bold">{{ userdata.total_followers }}</span>
+            <span class="text-sm font-semibold tracking-wider">Follower</span>
         </div>
         <div class="w-1/3 flex flex-col text-center gap-y-1">
-            <span class="text-4xl text-bold">12</span>
-            <span class="text-sm font-semibold tracking-wider">Airbuddys</span>
+            <span class="text-4xl text-bold">{{ userdata.total_followed }}</span>
+            <span class="text-sm font-semibold tracking-wider">Followed</span>
         </div>
     </div>
 
     <div v-for="(flight, index) in data" :key="index">
-      <RouterLink :to="`../flights/view/${ flight.flight_id }`">
+      <RouterLink :to="`../buddyflight/view/${ flight.flight_id }`">
         <FlightCard :flight="flight" />
       </RouterLink>
     </div>
@@ -39,14 +39,17 @@
 import { ref, onMounted } from "vue";
 import { useSessionStore } from '@/store/user';
 import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { apiGet, apiPost } from '@/utils/api';
 import FlightCard from "@/components/FlightCard.vue"
 const token = useSessionStore().sessionToken;
-  
+
+const route = useRoute(); 
 const router = useRouter();
 const loaded = ref(false)
 const isUpdating = ref(false);
 const data = ref(null);
+const userId = route.params.id;
 
 const userdata = ref({
   "user_id": 1,
@@ -54,16 +57,23 @@ const userdata = ref({
   "e_mail": "budy@keinemail.no",
   "firstname": "Nobody",
   "lastname": "Noes",
-  "password": "cumulus1234",
-  "shv_nr": 12345,
-  "verifyed": true,
-  "disabled": false});
+  "profile_picture": null,
+  "total_flights": 1,
+  "total_followers": 1,
+  "total_followed": 1
+});
 
 async function fetchData() {
   loaded.value = false
+  const requestID = {
+    user_id: userId,
+  };
+  const requestIDforFlight = {
+    followed_id: userId,
+  }
   try {
-    //userdata.value = await apiGet('buddyprofile', null , token);
-    data.value = await apiGet('users_flights', null , token);
+    userdata.value = await apiGet('userprofile_other_user', requestID , token);
+    data.value = await apiGet('display_flights_of_followed', requestIDforFlight , token);
   }
   catch {
     null
@@ -75,12 +85,11 @@ async function fetchData() {
 
 async function sendFollowRequest() {
   isUpdating.value = true;
-  const userData = {
-    followed_id: userdata.user_id,
+  const requestIDforFollow = {
+    followed_id: userId,
   };
   try {
-    const response = await apiPost('follow_request', userData, token);
-    console.log("Follow Request erfolgreich", response);
+    const response = await apiPost('follow_request', requestIDforFollow, token);
   }
   catch(error) {
     console.log(error);
@@ -90,7 +99,6 @@ async function sendFollowRequest() {
     isUpdating.value = false;
   }
 }
-
 
 onMounted(async () => {
   fetchData()

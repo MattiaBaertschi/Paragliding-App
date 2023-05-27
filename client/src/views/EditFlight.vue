@@ -1,4 +1,8 @@
 <template>
+
+    <div v-if="loaded == true" class="flex flex-col p-4 bg-white rounded-xl space-y-2">
+    <MapComponent :flightPath="currentFlight.data.gnss_records_simple" :mapControls="true" class="w-full h-16"/>
+    </div>
     <div class="flex flex-col p-4 bg-white rounded-xl space-y-2">
       <input-component label="Flugname" v-model="currentFlight.data.flight_name" />
       <input-component label="Startplatz" v-model="currentFlight.data.takeoff" />
@@ -7,14 +11,9 @@
       <input-component label="Flugzeit" v-model="currentFlight.data.duration" />
       <input-component label="Gleitschirm" v-model="currentFlight.data.glider" />
       <input-component label="Kommentar" v-model="currentFlight.data.comment" />
-      
-        <!-- <label class="block text-sm font-medium text-gray-700">Bilder</label>
-        <div v-for="(image, index) in currentFlight.data.images" :key="index">
-          <img :src="`${imageURL}/${image}`" alt="Flugbild" class="w-20 h-20"/>
-          <button @click="deleteImage(index)" class="p-1 text-red-600">Bild löschen</button>
-        </div> -->
 
-      <button @click="updateFlight()" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 my-8 text-white bg-black rounded">Daten aktualisieren</button>
+    
+      <PrimaryButton :action="updateFlight" :disabled="isUpdating" :loading="isUpdating" color="weiss" buttonText="Daten aktualisieren"/>
     </div>
     <div class="flex flex-col p-4 bg-white rounded-xl space-y-2 mt-4 w-full">
       <div>
@@ -28,16 +27,16 @@
                 @click="selectImage(image)"/>
           </div>
         </div>
+        <PrimaryButton :action="deleteImages" :disabled="isUpdating" :loading="isUpdating" color="weiss" buttonText="Auswahl löschen"/>
           <button @click="deleteImages" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 mt-2text-black bg-light rounded w-full">Bilder löschen</button>
         </div>
         <div class="pt-8">
           <input type="file" multiple @change="uploadImages" ref="fileInput"/>
         <button @click="submitImages" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 mt-4 text-white bg-black rounded w-full">Bilder hochladen</button>
+        <PrimaryButton :action="submitImages" :disabled="isUpdating" :loading="isUpdating" color="weiss" buttonText="Bilder hochladen"/>
       </div>
     </div>
-    <RouterLink :to="`/flights/view/${ id }`">
-        Flug ansehen
-      </RouterLink>
+    <PrimaryButton :isRouterLink="true" :link="`/flights/view/${ id }`" color="schwarz" buttonText="Flug ansehen"/>
   </template>
   
 <script setup>
@@ -47,6 +46,8 @@ import InputComponent from "@/components/InputComponent.vue"
 import { apiGet, apiPost } from '@/utils/api';
 import { useSessionStore } from '@/store/user';
 import ButtonComponent from "@/components/ButtonComponent.vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
+import MapComponent from "@/components/MapComponent.vue";
 
 const token = useSessionStore().sessionToken;
 const imageURL = "https://hoemknoebi.internet-box.ch/images/flight_images"

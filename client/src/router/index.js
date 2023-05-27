@@ -11,6 +11,8 @@ import LoginForm from "@/views/LoginForm.vue"
 import RegisterForm from "@/views/RegisterForm.vue"
 import EditFlight from "@/views/EditFlight.vue"
 import ViewBuddy from "@/views/ViewBuddy.vue"
+import ViewBuddyFlight from "@/views/ViewBuddyFlight.vue"
+import BuddyOverview from "@/views/BuddyOverview.vue"
 
 const routes = [
     {
@@ -49,9 +51,19 @@ const routes = [
         component: FlightOverview
     },
     {
+        path: "/buddys",
+        name: "buddys",
+        component: BuddyOverview
+    },
+    {
         path: "/flights/view/:id",
         name: "viewflights",
         component: ViewFlight
+    },
+    {
+        path: "/buddyflight/view/:id",
+        name: "buddyflights",
+        component: ViewBuddyFlight
     },
     {
         path: "/flights/edit/:id",
