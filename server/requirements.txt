@@ -1,0 +1,7 @@
+SQLAlchemy
+fastapi
+shapely
+jose
+requests
+smtplib
+email
