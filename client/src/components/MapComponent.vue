@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, onMounted, toRaw, ref, computed } from 'vue'
+import { defineProps, onMounted, ref, computed } from 'vue'
 
 const props = defineProps({
   flightPath: { 
@@ -37,7 +37,7 @@ const stop_coordinate = flightPathWebMecator.value[flightPathWebMecator.value.le
 //const stop_coordinate = computed(()=> flightPathWebMecator.value[flightPathWebMecator.value.length -1])
 
 function toWebMercator(coord) {
-  const [lat, lon] = coord;
+  const [lon, lat] = coord;
   const r_major = 6378137.0; // Equatorial radius in meters
   const x = r_major * (Math.PI * lon / 180);
   const scale = x / lon;
@@ -57,11 +57,8 @@ const calcMapCenter = (coordinates) => {
 
   const avgLongitude = Math.round(sumLongitudes / coordinates.length);
   const avgLatitude = Math.round(sumLatitudes / coordinates.length);
-  console.log(avgLatitude)
 
   const mapCenter = [avgLongitude,avgLatitude]
-  console.log(mapCenter)
-
   return mapCenter
 }
 
@@ -82,9 +79,9 @@ const calcGeomExtent = (geometry) => {
     parseFloat(max_long.toFixed(14))+(max_long-min_long)*0.1,
     parseFloat(max_lat.toFixed(14))+(max_lat-min_lat)*0.1,
   ];
-  console.log("mapExtent:", result);
   return(result)
 }
+
 
 
 onMounted( () => {   
@@ -95,7 +92,7 @@ onMounted( () => {
 
 <template>
 
-  <div class="w-full h-full object-cover">
+  <div class="w-full h-full object-cover min-h-[12em]">
   <ol-map ref="map" :loadTilesWhileAnimating="true" :loadTilesWhileInteracting="true" :mouseWheelZoom="mapControls" :key="mapControls" style="height:100%">
 
   <ol-view ref="view" :center=calcMapCenter(flightPathWebMecator) :rotation="rotation" :zoom="zoom" :projection="projection" />

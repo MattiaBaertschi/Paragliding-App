@@ -1,31 +1,36 @@
 <script setup>
-import axios from 'axios';
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import CardComponent from "@/components/CardComponent.vue"
+import { apiGet, apiPost } from '@/utils/api';
+import { useSessionStore } from '@/store/user';
+import LoadingComponent from '@/components/LoadingComponent.vue';
 
-const jsonData = reactive({ data: [] })
+const token = useSessionStore().sessionToken;
 
-const fetchData = async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:8000/get_startpage');
-      const jsonData = response.data;
-      console.log(jsonData)
-      return jsonData
-    } catch (err) {
-      console.error(err);
-    }
-  }
+const feedData = reactive({ data: [] })
+var loaded = ref(false)
 
-  onMounted(async () => {
-    jsonData.value = await fetchData()
-  })
+onMounted(async () => {
+  feedData.data = await apiGet('feed', null, token);
+  loaded = true
+})
 </script>
 
 <template>
-    <div>
-    <!--<h1>{{jsonData.value}}</h1>-->
-      <div v-for="(flight, index) in jsonData.value" :key="index">
-        <CardComponent  :flight="flight"/> 
+  <LoadingComponent v-if="loaded == false" />
+  <RouterLink to="upload">
+  <div v-if="feedData.data == null && loaded == true" class="w-full text-xl h-64 bg-white rounded-xl text-center p-8 pt-16 tracking-wider ">
+    <p class="margin-auto">Noch keine Flüge vorhanden, beginne mit dem Hochladen eines Fluges…</p>
+
+        <div class="p-2 text-center">
+          <div class="text-lg font-semibold mt-6">+ Flug hochladen</div>
+
+      </div>
+    </div>
+  </RouterLink>
+  <div>
+    <div v-for="(flight, index) in feedData.data" :key="index">
+      <CardComponent  :flight="flight"/> 
     </div>
   </div>
 </template>

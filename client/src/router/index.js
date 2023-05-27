@@ -10,6 +10,7 @@ import LoadingScreen from "@/views/LoadingScreen.vue"
 import LoginForm from "@/views/LoginForm.vue"
 import RegisterForm from "@/views/RegisterForm.vue"
 import EditFlight from "@/views/EditFlight.vue"
+import ViewBuddy from "@/views/ViewBuddy.vue"
 
 const routes = [
     {
@@ -66,6 +67,11 @@ const routes = [
         path: "/register",
         name: "Registrieren",
         component: RegisterForm
+    },
+    {
+        path: "/buddy/:id",
+        name: "viewbuddy",
+        component: ViewBuddy
     }
 ]
 

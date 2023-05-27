@@ -7,7 +7,7 @@
     <p>@{{ userdata.username }}</p>
 
     <div class="flex mb-4 gap-x-2 mt-4">
-      <router-link to="/profil/bearbeiten" class="bg-white hover:bg-secondary rounded-full px-4 py-2">Bearbeiten</router-link>
+      <div @click="sendFollowRequest" class="bg-white hover:bg-secondary rounded-full px-4 py-2">Folgen</div>
     </div>
   </div>
 
@@ -26,29 +26,12 @@
         </div>
     </div>
 
-    <div class="pt-4 flex gap-2">
-    <RouterLink to="/flights" class="flex my-2 w-1/2">
-        <div class="bg-white w-full p-4 rounded-xl">
-            <div class="text-black uppercase font-bold text-sm tracking-wider">#{{ userdata.total_flights }}</div>
-            <div class="text-2xl font-semibold">Flüge</div>
-        </div>
-    </RouterLink>
-    <RouterLink to="/flights" class="flex my-2 w-1/2">
-        <div class="bg-white w-full p-4 rounded-xl">
-            <div class="text-black uppercase font-bold text-sm tracking-wider">#15</div>
-            <div class="text-2xl font-semibold">Airbudys</div>
-        </div>
-    </RouterLink>
+    <div v-for="(flight, index) in data" :key="index">
+      <RouterLink :to="`../flights/view/${ flight.flight_id }`">
+        <FlightCard :flight="flight" />
+      </RouterLink>
     </div>
 
-    <UserStats/>
-    
-    <div class="my-64">
-      <p class="mb-4">Cloudy übernimmt keine Gewähr für die Korrektheit der dargestelltetn Daten.</p>
-      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-white rounded-full">Alle Daten exportieren</button>
-      <button class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-white rounded-full">Alle Daten Löschen</button>
-      <button @click="sessionStore.logout(); router.push('/login');" class="text-xs tracking-wider ml-2 px-4 py-2 my-1 bg-white rounded-full">Log out</button>
-    </div>
   </div>
 </template>
 
@@ -57,17 +40,18 @@ import { ref, onMounted } from "vue";
 import { useSessionStore } from '@/store/user';
 import { useRouter } from 'vue-router';
 import { apiGet, apiPost } from '@/utils/api';
-import axios from 'axios';
-import UserStats from "@/components/UserStats.vue";
-const sessionStore = useSessionStore()
-const token = sessionStore.sessionToken
+import FlightCard from "@/components/FlightCard.vue"
+const token = useSessionStore().sessionToken;
+  
 const router = useRouter();
 const loaded = ref(false)
+const isUpdating = ref(false);
+const data = ref(null);
 
 const userdata = ref({
   "user_id": 1,
-  "username": "nix",
-  "e_mail": "nix@keinemail.no",
+  "username": "yourbuddy",
+  "e_mail": "budy@keinemail.no",
   "firstname": "Nobody",
   "lastname": "Noes",
   "password": "cumulus1234",
@@ -76,8 +60,37 @@ const userdata = ref({
   "disabled": false});
 
 async function fetchData() {
-  userdata.value = await apiGet('userprofile', null , token);
+  loaded.value = false
+  try {
+    //userdata.value = await apiGet('buddyprofile', null , token);
+    data.value = await apiGet('users_flights', null , token);
+  }
+  catch {
+    null
+  }
+  finally {
+    loaded.value = true
+  }
 }
+
+async function sendFollowRequest() {
+  isUpdating.value = true;
+  const userData = {
+    followed_id: userdata.user_id,
+  };
+  try {
+    const response = await apiPost('follow_request', userData, token);
+    console.log("Follow Request erfolgreich", response);
+  }
+  catch(error) {
+    console.log(error);
+  }
+  finally{
+    fetchData()
+    isUpdating.value = false;
+  }
+}
+
 
 onMounted(async () => {
   fetchData()

@@ -1,6 +1,5 @@
 <script setup>
-import axios from 'axios';
-import { onMounted, reactive, toRaw, ref } from 'vue';
+import { onMounted, reactive, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import LineChart from "@/components/LineChart.vue";
 import MapComponent from "@/components/MapComponent.vue";
@@ -13,86 +12,111 @@ import remove from '@/assets/remove.svg';
 import edit from '@/assets/edit.svg';
 import stopwatch from '@/assets/stopwatch.svg';
 import user from '@/assets/user.svg';
+import { apiGet, apiPost } from '@/utils/api';
+import { useSessionStore } from '@/store/user';
+import { useRouter } from 'vue-router';
+
+const token = useSessionStore().sessionToken;
+
 
 var loaded = ref(false)
 var mapIsExpanded = ref(false)
-const route = useRoute();  
+const isUpdating = ref(false)
+const route = useRoute(); 
+const router = useRouter();
 const id = route.params.id;
-const flight_id = "flug_" + id // read parameter id (it is reactive) 
 var currentFlight = reactive({ data: []})
 
-  const fetchData = async () => {
-      try {
-        const response = await axios.get('http://127.0.0.1:8000/get_flight_details');
-        const jsonData = response.data;
-        return jsonData
-      } catch (err) {
-        console.error(err);
-    }
-  }
 
-  onMounted(async () => {
-    console.log("mounted", currentFlight)
-    currentFlight.data = await fetchData()
-    console.log("currentFlight", currentFlight.data)
-    loaded.value = true
-    console.log("flugid ist:", currentFlight.data.id)
-  })
+const timeStamps = computed(() => currentFlight.data.terrain.map(record => {
+  let timestampStr = String(record[1]);
+  while (timestampStr.length < 6) {
+    timestampStr = '0' + timestampStr;
+  }
+  return `${timestampStr.slice(0, 2)}:${timestampStr.slice(2, 4)}`;
+}));
+
+const aboveGround = computed(() => currentFlight.data.alt_gnss.map(record => record[0]));
+const aboveSeaLevel = computed(() => currentFlight.data.terrain.map(record => record[0]));
+onMounted(async () => {
+  currentFlight.data = await apiGet('get_flight_detail', { flight_id: id }, token);
+  loaded.value = true
+})
 
 function toggleMap() {
   mapIsExpanded.value = !mapIsExpanded.value
-
-  console.log(mapIsExpanded.value)
 }
+
+const deleteFlight = async () => {
+  isUpdating.value = true
+  console.log("Flug löschen")
+  const flightData = {flight_id: id};
+  try {
+    await apiPost('delete_flight', flightData, token, null);
+  } 
+  catch (error) {
+    console.error(error);
+  }
+  finally{
+    isUpdating.value = false;
+    router.push(`/flights`)
+    }
+}
+
 </script>
 
 
 <template>
+<div>
+    <div v-if="loaded == false" class="h-full w-full bg-red-700"></div>
     <span class="hidden">{{ currentFlight.data }}</span>
     <div v-if="loaded == true">
     <div v-if="mapIsExpanded == false">
-      <ImageCarousel/>
+      <ImageCarousel :gnss_records="currentFlight.data.gnss_records" :images="currentFlight.data.images"/>
 
-      <div class="bg-white p-4 rounded-xl my-4">
         <div class="text-2xl mb-4 tracking-wider font-bold">{{ currentFlight.data.flight_name }}</div>
-        <div class="flex">
+      <div class="bg-white p-4 rounded-xl my-4">
+        <div class="flex mb-4">
           <img :src="user" alt="Cloudys" class="w-6 h-6 mr-2">
-          <div class="text-xl mb-4">{{ currentFlight.data.user_id }} Rüedel??</div>
+          <div class="text-xl">{{ currentFlight.data.username }}</div>
         </div>
-        <div class="flex">
+        <div class="flex mb-4">
           <img :src="takeoff" alt="Cloudys" class="w-6 h-6 mr-2">
-          <div class="text-xl mb-4">{{ currentFlight.data.takeoff }}</div>
+          <div class="text-xl">{{ currentFlight.data.takeoff }}</div>
         </div>
-        <div class="flex">
+        <div class="flex mb-4">
           <img :src="landing" alt="Cloudys" class="w-6 h-6 mr-2">
-          <div class="text-xl mb-4">{{ currentFlight.data.landing }}</div>
+          <div class="text-xl">{{ currentFlight.data.landing }}</div>
         </div>
-        <div class="flex">
+        <div class="flex mb-4">
           <img :src="date" alt="Cloudys" class="w-6 h-6 mr-2">
-          <div class="text-xl mb-4">{{ currentFlight.data.date }}</div>
+          <div class="text-xl">{{ currentFlight.data.date }}</div>
         </div>
         <div class="flex">
         <img :src="stopwatch" alt="Cloudys" class="w-6 h-6 mr-2">
-        <div class="text-xl">{{ currentFlight.data.time }}Tschuldigung schnäu </div>
+        <div class="text-xl">{{ currentFlight.data.duration }}</div>
         </div>
       </div>
+      <div v-show="currentFlight.data.comment != null" class="bg-white p-4 rounded-xl my-4">
+        <p class="font-semibold text-sm tracking-wider">Kommentar</p>
+        <p>{{ currentFlight.data.comment }}</p>
+      </div>
       <div class="mb-4">
-        <RouterLink :to="`edit/${ currentFlight.data.id }`">edit</RouterLink>
-        <ButtonComponent text="Flug bearbeiten" :path="`../edit/${ currentFlight.data.id }`" :icon="edit" />
-      <ButtonComponent text="Löschen" path="/delete" :icon="remove" />
+        <RouterLink :to="`edit/${ currentFlight.data.id }`"></RouterLink>
+        <ButtonComponent text="Flug bearbeiten" :path="`../edit/${ id }`" :icon="edit" />
+      <ButtonComponent text="Löschen" @click="deleteFlight" path="" :icon="remove" />
       </div>
     </div>
 
       <div>
       <div class="" :class="{ 'relative w-full h-64': !mapIsExpanded, 'absolute top-0 left-0 h-screen w-full': mapIsExpanded }">
-        <MapComponent :flightPath="currentFlight.data.polyline" :mapControls="mapIsExpanded"/>
-        <!--<div class="absolute top-2 left-2 px-4 py-1 bg-black text-white rounded-lg text-sm tracking-wider">{{ currentFlight.data.temp }} | {{ currentFlight.data.wind }}</div>-->
+        <MapComponent :flightPath="currentFlight.data.gnss_records" :mapControls="mapIsExpanded"/>
         <div v-if="mapIsExpanded == true" class="absolute bottom-14 mx-auto px-4 py-4 bg-black text-white text-sm tracking-wider w-full text-center cursor-pointer" @click="toggleMap">Karte schliessen</div>
       </div>
       <div @click="toggleMap" class="w-full flex justify-center items-center bg-white hover:bg-medium tracking-wider py-2 px-4 rounded-xl my-2 mb-8 cursor-pointer">Karte öffnen</div>
     </div>
     <h2 class="text-center text-xl mb-4">Statistik</h2>
-    <div><LineChart v-if="loaded == true" :dataLabel="currentFlight.data.time_stamps" :data1="currentFlight.data.alt" :data2="currentFlight.data.agl"/></div>
+    <div><LineChart v-if="loaded == true" :dataLabel="timeStamps" :data1="aboveGround" :data2="aboveSeaLevel"/></div>
   </div>
-
+</div>
 </template>

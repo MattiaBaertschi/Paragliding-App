@@ -1,62 +1,160 @@
 <template>
     <div class="flex flex-col p-4 bg-white rounded-xl space-y-2">
-      <input-component label="Flugname" v-model="flightData.name" />
-      <input-component label="Startplatz" v-model="flightData.startLocation" />
-      <input-component label="Landeplatz" v-model="flightData.endLocation" />
-      <input-component label="Datum" v-model="flightData.date" type="date" />
-      <input-component label="Flugzeit" v-model="flightData.flightTime" />
-  
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Bilder</label>
-        <div v-for="(image, index) in flightData.images" :key="index">
-          <img :src="image" alt="" class="w-20 h-20"/>
+      <input-component label="Flugname" v-model="currentFlight.data.flight_name" />
+      <input-component label="Startplatz" v-model="currentFlight.data.takeoff" />
+      <input-component label="Landeplatz" v-model="currentFlight.data.landing" />
+      <input-component label="Datum" v-model="currentFlight.data.date" type="date" />
+      <input-component label="Flugzeit" v-model="currentFlight.data.duration" />
+      <input-component label="Gleitschirm" v-model="currentFlight.data.glider" />
+      <input-component label="Kommentar" v-model="currentFlight.data.comment" />
+      
+        <!-- <label class="block text-sm font-medium text-gray-700">Bilder</label>
+        <div v-for="(image, index) in currentFlight.data.images" :key="index">
+          <img :src="`${imageURL}/${image}`" alt="Flugbild" class="w-20 h-20"/>
           <button @click="deleteImage(index)" class="p-1 text-red-600">Bild löschen</button>
-        </div>
-        <input type="file" @change="uploadImage" class="mt-2 mb-4"/>
-      </div>
-  
-      <button @click="updateFlight" class="px-4 py-2 text-white bg-black rounded">Daten aktualisieren</button>
+        </div> -->
+
+      <button @click="updateFlight()" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 my-8 text-white bg-black rounded">Daten aktualisieren</button>
     </div>
+    <div class="flex flex-col p-4 bg-white rounded-xl space-y-2 mt-4 w-full">
+      <div>
+          <label class="font-semibold tracking-wider mb-4 mt-4">Bilder</label>
+          <div class="flex gap-2 my-4">
+          <div v-for="(image, index) in currentFlight.data.images" :key="index" class="">
+            <img :src="`${imageURL}/${image}`" 
+                :class="{ 'border-4 border-red-600': isSelected(image) }" 
+                alt="Flugbild" 
+                class="w-24 h-20" 
+                @click="selectImage(image)"/>
+          </div>
+        </div>
+          <button @click="deleteImages" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 mt-2text-black bg-light rounded w-full">Bilder löschen</button>
+        </div>
+        <div class="pt-8">
+          <input type="file" multiple @change="uploadImages" ref="fileInput"/>
+        <button @click="submitImages" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 mt-4 text-white bg-black rounded w-full">Bilder hochladen</button>
+      </div>
+    </div>
+    <RouterLink :to="`/flights/view/${ id }`">
+        Flug ansehen
+      </RouterLink>
   </template>
   
-  <script setup>
-  import { ref, onMounted } from 'vue'
-  import axios from 'axios'
-  import InputComponent from '@/components/InputComponent.vue'
-  
-  const flightData = ref({})
-  
-  onMounted(async () => {
-    const response = await axios.get('/api/flight')
-    flightData.value = response.data
-  })
-  
-  const updateFlight = async () => {
-    await axios.put('/api/flight', flightData.value)
+<script setup>
+import { onMounted, reactive, ref, toRaw } from 'vue';
+import { useRoute } from 'vue-router';
+import InputComponent from "@/components/InputComponent.vue"
+import { apiGet, apiPost } from '@/utils/api';
+import { useSessionStore } from '@/store/user';
+import ButtonComponent from "@/components/ButtonComponent.vue";
+
+const token = useSessionStore().sessionToken;
+const imageURL = "https://hoemknoebi.internet-box.ch/images/flight_images"
+const images = ref(null);
+
+
+let isUpdating = ref(false);
+
+
+onMounted(async () => {
+  fetchData()
+  loaded.value = true
+})
+
+async function fetchData() {
+  currentFlight.data = await apiGet('get_flight_edit', { flight_id: id }, token);
+}
+
+async function updateFlight() {
+  isUpdating.value = true;
+  const flightData = {
+    flight_id: id,
+    flight_name: currentFlight.data.flight_name,
+    comment: currentFlight.data.comment,
+    glider: currentFlight.data.glider,
+    takeoff: currentFlight.data.takeoff,
+    landing: currentFlight.data.landing,
+    date: currentFlight.data.date
+  };
+  try {
+    const response = await apiPost('edit_flight', flightData, token);
+    console.log("Daten erfolgreich aktualisiert", response);
+  } 
+  catch(error) {
+    console.log(error);
   }
-  
-  const deleteImage = (index) => {
-    flightData.value.images.splice(index, 1)
+  finally{
+    fetchData()
+    isUpdating.value = false;
   }
-  
-  const uploadImage = async (event) => {
-    const file = event.target.files[0]
-    const formData = new FormData()
-    formData.append('file', file)
-  
-    const response = await axios.post('/api/flight/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-  
-    if (response.data.success) {
-      flightData.value.images.push(response.data.imageUrl)
+}
+
+var loaded = ref(false)
+const route = useRoute();  
+const id = route.params.id;
+var currentFlight = reactive({ data: []})
+const flightData = {flight_id: id};
+
+const selectedImages = ref([]);
+const selectImage = (image) => {
+  const index = selectedImages.value.indexOf(image);
+  if(index === -1){
+    selectedImages.value.push(image);
+  }
+  else{
+    selectedImages.value.splice(index, 1);
+  }
+};
+
+async function deleteImages () {
+  if(selectedImages.value.length > 0){
+    isUpdating.value = true;
+    console.log("bilder zum löschen", selectedImages.value)
+    const postData = toRaw(selectedImages.value)
+    console.log("bilder zum löschen:", postData)
+    try {
+      const response = await apiPost("delete_flight_image", flightData , token, postData)
+      console.log(response)
+    }
+    catch(error){
+      console.log(error)
+    }
+    finally{
+      fetchData()
+      isUpdating.value = false;
     }
   }
-  </script>
+};
+
+const isSelected = (image) => {
+  return selectedImages.value.includes(image);
+};
+
+const uploadImages = (event) => {
+  images.value = event.target.files;
+};
+
+const submitImages = async () => {
+  isUpdating.value = true
+  const formData = new FormData();
   
-  <style scoped>
-  /* Hier können Sie zusätzliche Tailwind CSS-Stile hinzufügen */
-  </style>
+  for (let i = 0; i < images.value.length; i++) {
+    formData.append('files', images.value[i]);
+  }
+
+  try {
+    await apiPost('upload_flight_image', flightData, token, formData);
+  } 
+  catch (error) {
+    console.error(error);
+  }
+  finally{
+    fetchData()
+    isUpdating.value = false;
+    }
+};
+
+
+</script>
+  
   

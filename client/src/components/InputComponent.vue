@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col mb-4">
     <label class="block text-sm mb-2" :for="label">{{ label }}</label>
-    <input class="border border-gray-400 p-2 rounded focus:outline-none focus:ring-2 focus:ring-black rounded"
+    <input class="border border-gray-400 p-2 rounded focus:outline-none focus:ring-2 focus:ring-black"
            :id="label"
            :type="type"
            :value="modelValue"
@@ -11,6 +11,7 @@
 
 
 <script setup>
+import { defineProps, defineEmits } from 'vue'
 const props = defineProps({
   modelValue: {
     type: [String, Date],
@@ -25,9 +26,10 @@ const props = defineProps({
     default: 'text'
   }
 })
+const emit = defineEmits(['update:modelValue'])
 
-const updateValue = (event) => {
-  emit('update:modelValue', event.target.value)
+const updateValue = (e) => {
+  emit('update:modelValue', e.target.value)
 }
 </script>
 
