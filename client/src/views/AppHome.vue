@@ -18,6 +18,16 @@ onMounted(async () => {
 
 <template>
   <LoadingComponent v-if="loaded == false" />
+  <RouterLink to="upload">
+  <div v-if="feedData.data == null && loaded == true" class="w-full text-xl h-64 bg-white rounded-xl text-center p-8 pt-16 tracking-wider ">
+    <p class="margin-auto">Noch keine Flüge vorhanden, beginne mit dem Hochladen eines Fluges…</p>
+
+        <div class="p-2 text-center">
+          <div class="text-lg font-semibold mt-6">+ Flug hochladen</div>
+
+      </div>
+    </div>
+  </RouterLink>
   <div>
     <div v-for="(flight, index) in feedData.data" :key="index">
       <CardComponent  :flight="flight"/> 

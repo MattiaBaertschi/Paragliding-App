@@ -5,7 +5,7 @@ import { ref, inject, computed, watch } from 'vue'
   // https://github.com/highcanfly-club/vue-highcanfly/blob/5f757f3a4ccf077bf56a18734ca8cf07bd912e99/src/components/Maps/OLMapSitesDePratique.vue
   const center = ref([828127, 5934275]);
   const projection = ref('EPSG:3857');
-  const zoom = ref(8)
+  const zoom = ref(10)
   const rotation = ref(0)
   const strokeWidth = ref(2)
   const strokeColor = ref('black')
@@ -56,7 +56,7 @@ import { ref, inject, computed, watch } from 'vue'
         style.getFill().setColor(getColorShade(0,537,properties));
       }
   }
-
+  
   const setRegionColor = (flightCount) => {
     console.log(flightCount)
     return "yellow"
@@ -64,6 +64,7 @@ import { ref, inject, computed, watch } from 'vue'
 
   watch(activeRegion, (newValue, oldValue) => {
     console.log("bliblablub",newValue)
+    
   })
 
 defineProps({
@@ -90,6 +91,11 @@ function getColorShade(minValue, maxValue, value) {
 
 console.log(getColorShade(1,500,499))
 
+const currentZoom = ref(zoom.value);
+const zoomChanged = (newZoom) => {
+    currentZoom.value = newZoom;
+  };
+
 
 </script>
 
@@ -97,6 +103,9 @@ console.log(getColorShade(1,500,499))
 <div>
   <div class="fixed bottom-14 z-10 left-0 right-0 bg-white px-4 py-4 flex center">
   <p><strong>Region:</strong> {{ activeRegion }}</p>
+  <div>
+ zoom : {{ currentZoom }} 
+  </div>
 </div>
 
   <ol-map 
@@ -111,6 +120,7 @@ console.log(getColorShade(1,500,499))
       :rotation="rotation" 
       :zoom="zoom" 
       :projection="projection" 
+      @zoomChanged="zoomChanged"
     />
     <ol-zoom-control/>
     <ol-fullscreen-control/>
@@ -145,6 +155,7 @@ console.log(getColorShade(1,500,499))
         :projection="projection"
       /> -->
       <ol-source-vector
+        v-if="currentZoom > 7"
         ref="cities"
         url="http://localhost:5173/src/data/hexagon_swiss_12km_wgs84_reform.geojson"
         :format="geoJson"

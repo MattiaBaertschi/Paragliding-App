@@ -83,6 +83,7 @@ const calcGeomExtent = (geometry) => {
 }
 
 
+
 onMounted( () => {   
     view.value.view.fit(calcGeomExtent(flightPathWebMecator))   
   })

@@ -12,13 +12,18 @@ import remove from '@/assets/remove.svg';
 import edit from '@/assets/edit.svg';
 import stopwatch from '@/assets/stopwatch.svg';
 import user from '@/assets/user.svg';
-import { apiGet } from '@/utils/api';
+import { apiGet, apiPost } from '@/utils/api';
 import { useSessionStore } from '@/store/user';
+import { useRouter } from 'vue-router';
+
 const token = useSessionStore().sessionToken;
+
 
 var loaded = ref(false)
 var mapIsExpanded = ref(false)
-const route = useRoute();  
+const isUpdating = ref(false)
+const route = useRoute(); 
+const router = useRouter();
 const id = route.params.id;
 var currentFlight = reactive({ data: []})
 
@@ -41,6 +46,23 @@ onMounted(async () => {
 function toggleMap() {
   mapIsExpanded.value = !mapIsExpanded.value
 }
+
+const deleteFlight = async () => {
+  isUpdating.value = true
+  console.log("Flug löschen")
+  const flightData = {flight_id: id};
+  try {
+    await apiPost('delete_flight', flightData, token, null);
+  } 
+  catch (error) {
+    console.error(error);
+  }
+  finally{
+    isUpdating.value = false;
+    router.push(`/flights`)
+    }
+}
+
 </script>
 
 
@@ -77,7 +99,7 @@ function toggleMap() {
       <div class="mb-4">
         <RouterLink :to="`edit/${ currentFlight.data.id }`"></RouterLink>
         <ButtonComponent text="Flug bearbeiten" :path="`../edit/${ id }`" :icon="edit" />
-      <ButtonComponent text="Löschen" path="/delete" :icon="remove" />
+      <ButtonComponent text="Löschen" @click="deleteFlight" path="" :icon="remove" />
       </div>
     </div>
 
