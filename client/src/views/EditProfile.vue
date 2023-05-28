@@ -18,7 +18,7 @@
       class="absolute bottom-4 ml-32 bg-white text-white p-4 rounded-full" 
       @click="isUploadExpanded = true"
     >
-      <img :src="edit" alt="edit" class="inline h-6 w-6" />
+      <img :src="add" alt="add" class="inline h-6 w-6" />
     </button>
   </div>
   <div class="text-center">
@@ -69,7 +69,7 @@
   import PrimaryButton from "@/components/PrimaryButton.vue";
   import profileSVG from '@/assets/user.svg';
   import remove from '@/assets/remove.svg';
-  import edit from '@/assets/edit.svg';
+  import add from '@/assets/add.svg';
   import InputComponent from "@/components/InputComponent.vue"
 
   const sessionStore = useSessionStore()

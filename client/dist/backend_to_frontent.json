@@ -1,0 +1,13 @@
+{
+"flug_1": {
+    "benutzer_id": 1,
+    "polyline": "LINESTRING(7.494929 46.443797,7.492911 46.441696,7.468163 46.437157,7.457305 46.440436)",
+    "startplatz": "Metschstand(SW)",
+    "landeplatz": "Lenk(Winter)",
+    "biplace": null,
+    "datum": "2023, 3, 21",
+    "gleitschirm": "Synphonia",
+    "bild_link": "./test"
+
+}
+}

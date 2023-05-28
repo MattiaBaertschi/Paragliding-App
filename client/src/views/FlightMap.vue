@@ -26,8 +26,9 @@ const data = ref({
 
 onMounted(async () => {
   data.value = await apiGet('most_flights_per_region', null , token);
+  //data.value = await apiGet('flight_in_region', null , token);
   maxFlightCount.value = Math.max(...Object.values(data.value).map(item => item.count));
- // console.log("211", maxFlightCount.value)
+  console.log("211", maxFlightCount.value)
   //loaded.value = true
 })
 
@@ -58,7 +59,6 @@ onMounted(async () => {
   const geoJson = new format.GeoJSON();
   const selectConditions = inject("ol-selectconditions");
   const selectCondition = selectConditions.singleClick;
-  const url = "http://localhost:5173/src/data/regions.json"
   const featureSelected = (event) => {
       if (event.selected.length != 0){
       const SelectedRegion = event.selected[0].values_
@@ -109,12 +109,7 @@ function getCountById(id) {
 }
 
 function calculateColor(regionID) {
-  const multiplicator = 1 / maxFlightCount.value
-  const flightCount = getCountById(regionID)
-  console.log("regionid", regionID, "hat soviel Flüge:", flightCount)
-    const ratio = flightCount * multiplicator ;
-    const greenValue = Math.round(ratio * 255);
-    console.log("grüewärt",greenValue, "Max_wert:", maxFlightCount.value)
+    const greenValue = Math.round(getCountById(regionID) * 1 / maxFlightCount.value * 255);
     const RGBA_value = `rgba(0, ${greenValue}, 0, 0.5)`
     return  RGBA_value;
 }
@@ -183,6 +178,13 @@ const zoomChanged = (newZoom) => {
         :format="geoJson"
         :projection="projection"
       />
+      <!-- <ol-source-vector
+        v-if="currentZoom > 7"
+        ref="cities"
+        url="https://paracloudy.ch/assets/hexagon_swiss_10km_wgs84_reform.geojson"
+        :format="geoJson"
+        :projection="projection"
+      /> -->
 
       <ol-style :overrideStyleFunction="overrideStyleFunction">
         <ol-style-stroke color="black" :width="0.2"></ol-style-stroke>

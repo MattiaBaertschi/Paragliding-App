@@ -8,10 +8,9 @@ import ButtonComponent from "@/components/ButtonComponent.vue";
 import takeoff from '@/assets/takeoff.svg';
 import landing from '@/assets/landing.svg';
 import date from '@/assets/date.svg';
-import remove from '@/assets/remove.svg';
-import edit from '@/assets/edit.svg';
 import stopwatch from '@/assets/stopwatch.svg';
 import user from '@/assets/user.svg';
+import glider from '@/assets/glider.svg';
 import { apiGet, apiPost } from '@/utils/api';
 import { useSessionStore } from '@/store/user';
 import { useRouter } from 'vue-router';
@@ -97,7 +96,7 @@ const deleteFlight = async () => {
         <div class="text-xl">{{ currentFlight.data.duration }}</div>
         </div>
         <div class="flex mb-4">
-        <img :src="stopwatch" alt="Cloudys" class="w-6 h-6 mr-2">
+        <img :src="glider" alt="Cloudys" class="w-6 h-6 mr-2">
         <div class="text-xl">{{ currentFlight.data.glider }}</div>
         </div>
       </div>
