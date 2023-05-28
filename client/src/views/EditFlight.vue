@@ -1,7 +1,7 @@
 <template>
 
-    <div v-if="loaded == true" class="flex flex-col p-4 bg-white rounded-xl space-y-2">
-    <MapComponent :flightPath="currentFlight.data.gnss_records_simple" :mapControls="true" class="w-full h-16"/>
+    <div v-if="loaded == true" class="flex flex-col p-4 bg-white rounded-xl space-y-2 h-64 mb-4">
+    <MapComponent :flightPath="currentFlight.data.gnss_records_simple" :mapControls="true" class="w-full"/>
     </div>
     <div class="flex flex-col p-4 bg-white rounded-xl space-y-2">
       <input-component label="Flugname" v-model="currentFlight.data.flight_name" />
@@ -15,9 +15,8 @@
     
       <PrimaryButton :action="updateFlight" :disabled="isUpdating" :loading="isUpdating" color="weiss" buttonText="Daten aktualisieren"/>
     </div>
-    <div class="flex flex-col p-4 bg-white rounded-xl space-y-2 mt-4 w-full">
-      <div>
-          <label class="font-semibold tracking-wider mb-4 mt-4">Bilder</label>
+    <div  v-if="currentFlight.data.images && currentFlight.data.images.length > 0" class="flex flex-col p-4 bg-white rounded-xl space-y-2 mt-4 w-full">
+          <label class="font-semibold tracking-wider mb-4">Bilder verwalten</label>
           <div class="flex gap-2 my-4">
           <div v-for="(image, index) in currentFlight.data.images" :key="index" class="">
             <img :src="`${imageURL}/${image}`" 
@@ -27,12 +26,14 @@
                 @click="selectImage(image)"/>
           </div>
         </div>
-        <PrimaryButton :action="deleteImages" :disabled="isUpdating" :loading="isUpdating" color="weiss" buttonText="Auswahl löschen"/>
-          <button @click="deleteImages" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 mt-2text-black bg-light rounded w-full">Bilder löschen</button>
+        <PrimaryButton v-if="selectedImages.length > 0" :action="deleteImages" :disabled="isUpdating" :loading="isUpdating" color="weiss" buttonText="Auswahl löschen"/>
+        
         </div>
+        <div class="flex flex-col p-4 bg-white rounded-xl space-y-2 mt-4 w-full">
+          <label class="font-semibold tracking-wider mb-4">Bilder hochladen</label>
+        
         <div class="pt-8">
           <input type="file" multiple @change="uploadImages" ref="fileInput"/>
-        <button @click="submitImages" :disabled="isUpdating" :class="{ 'opacity-25 cursor-not-allowed': isUpdating }" class="px-4 py-2 mt-4 text-white bg-black rounded w-full">Bilder hochladen</button>
         <PrimaryButton :action="submitImages" :disabled="isUpdating" :loading="isUpdating" color="weiss" buttonText="Bilder hochladen"/>
       </div>
     </div>
@@ -52,9 +53,14 @@ import MapComponent from "@/components/MapComponent.vue";
 const token = useSessionStore().sessionToken;
 const imageURL = "https://hoemknoebi.internet-box.ch/images/flight_images"
 const images = ref(null);
+const loaded = ref(false)
+const route = useRoute();  
+const id = route.params.id;
+const currentFlight = reactive({ data: []})
+const flightData = {flight_id: id};
+const selectedImages = ref([]);
 
-
-let isUpdating = ref(false);
+const isUpdating = ref(false);
 
 
 onMounted(async () => {
@@ -62,7 +68,7 @@ onMounted(async () => {
   loaded.value = true
 })
 
-async function fetchData() {
+const fetchData = async () => {
   currentFlight.data = await apiGet('get_flight_edit', { flight_id: id }, token);
 }
 
@@ -90,13 +96,6 @@ async function updateFlight() {
   }
 }
 
-var loaded = ref(false)
-const route = useRoute();  
-const id = route.params.id;
-var currentFlight = reactive({ data: []})
-const flightData = {flight_id: id};
-
-const selectedImages = ref([]);
 const selectImage = (image) => {
   const index = selectedImages.value.indexOf(image);
   if(index === -1){
@@ -122,6 +121,7 @@ async function deleteImages () {
     }
     finally{
       fetchData()
+      selectedImages.value = "[]"
       isUpdating.value = false;
     }
   }

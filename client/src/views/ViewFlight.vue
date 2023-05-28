@@ -5,6 +5,7 @@ import LineChart from "@/components/LineChart.vue";
 import MapComponent from "@/components/MapComponent.vue";
 import ImageCarousel from "@/components/ImageCarousel.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
 import takeoff from '@/assets/takeoff.svg';
 import landing from '@/assets/landing.svg';
 import date from '@/assets/date.svg';
@@ -105,10 +106,9 @@ const deleteFlight = async () => {
         <p class="font-semibold text-sm tracking-wider">Kommentar</p>
         <p>{{ currentFlight.data.comment }}</p>
       </div>
-      <div class="mb-4">
-        <RouterLink :to="`edit/${ currentFlight.data.id }`"></RouterLink>
-        <ButtonComponent text="Flug bearbeiten" :path="`../edit/${ id }`" :icon="edit" />
-      <ButtonComponent text="Löschen" @click="deleteFlight" path="" :icon="remove" />
+      <div>
+        <PrimaryButton buttonText="Flug bearbeiten" :link="`../edit/${ id }`" :isRouterLink="true" :icon="edit"/>
+        <PrimaryButton buttonText="Flug löschen" :icon="remove" :action="deleteFlight"/>
       </div>
     </div>
 

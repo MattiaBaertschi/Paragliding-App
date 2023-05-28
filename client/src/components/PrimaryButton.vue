@@ -1,12 +1,15 @@
 <template>
-    <div :class="['p-2 mx-4 mb-4 tracking-wider rounded text-center', colorClass, { 'cursor-not-allowed': disabled }, { 'opacity-50': disabled }]" @click="handleClick">
-      <RouterLink v-if="isRouterLink" :to="link" class="w-full text-center">
+    <div :class="['p-2 mb-4 tracking-wider rounded text-center', colorClass, { 'cursor-not-allowed': disabled }, { 'opacity-50': disabled }]" @click="handleClick">
+      <RouterLink v-if="isRouterLink" :to="link" class="w-full text-center flex justify-center items-center">
         <img v-if="icon" :src="icon" class="h-6 w-6 mr-2" alt="Icon" />
-        <a class="w-full">{{ buttonText }}</a>
+        <a>{{ buttonText }}</a>
       </RouterLink>
       <button v-else class="w-full" :disabled="disabled">
         <span v-if="loading">Loading...</span>
-        <span v-else>{{ buttonText }}</span>
+        <div v-else class="w-full text-center flex justify-center items-center">
+          <img v-if="!isRouterLink && icon" :src="icon" class="h-6 w-6 mr-2" alt="Icon" />
+          {{ buttonText }}
+        </div>
       </button>
     </div>
   </template>

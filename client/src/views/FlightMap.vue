@@ -26,7 +26,8 @@ const data = ref({
 
 onMounted(async () => {
   data.value = await apiGet('most_flights_per_region', null , token);
-  //console.log(data.value)
+  maxFlightCount.value = Math.max(...Object.values(data.value).map(item => item.count));
+ // console.log("211", maxFlightCount.value)
   //loaded.value = true
 })
 
@@ -39,6 +40,7 @@ onMounted(async () => {
   const strokeWidth = ref(2)
   const strokeColor = ref('black')
   const format = inject('ol-format');
+  const maxFlightCount = ref(1)
   
   const flightRegion = [[46.91, 7.45], [46.47, 7.25], [46.74, 8.10]]
   const flightPathWebMecator = computed(() => flight_path.map(toWebMercator));
@@ -60,7 +62,7 @@ onMounted(async () => {
   const featureSelected = (event) => {
       if (event.selected.length != 0){
       const SelectedRegion = event.selected[0].values_
-      console.log(SelectedRegion.Name, SelectedRegion.Region, "color:", getColorShade(1,500,SelectedRegion.Region))
+      //console.log(SelectedRegion.Name, SelectedRegion.Region, "color:", getColorShade(1,500,SelectedRegion.Region))
       activeRegion.value = SelectedRegion.Region
       }
     };
@@ -76,8 +78,8 @@ onMounted(async () => {
     let properties= parseInt(feature.values_.Region)  //from extra data in properties of the feature
     
     if (Object.keys(data.value).includes(String(properties))) {
-      console.log("Super");
-      style.getFill().setColor("rgba(125, 200, 125, 1)");
+      //console.log("Super", properties);
+      style.getFill().setColor(calculateColor(properties));
     }
 
     else {
@@ -87,13 +89,13 @@ onMounted(async () => {
 
 
   watch(activeRegion, (newValue, oldValue) => {
-    console.log("Selected Region:" ,newValue)
+    //console.log("Selected Region:" ,newValue)
     try {
       activeRegionData.value = toRaw(data.value[newValue]);
-      console.log("scheisse",activeRegionData.value)
+      //console.log("scheisse",activeRegionData.value)
     }
     catch {
-      console.log(error)
+      //console.log(error)
     }
   }
   )
@@ -102,15 +104,21 @@ defineProps({
   msg: String,
 })
 
-function getColorShade(minValue, maxValue, value) {  
-  const colorRange = 255;
-  const index = Math.round((value - minValue) / (maxValue - minValue) * colorRange);
-  const red = 0
-  const green = Math.round(155 * (index / colorRange) + 100)
-  const blue = 0;
-
-    return `rgba('125, 125, 125, 0.5)`;
+function getCountById(id) {
+    return data.value[id] ? data.value[id].count : 0;
 }
+
+function calculateColor(regionID) {
+  const multiplicator = 1 / maxFlightCount.value
+  const flightCount = getCountById(regionID)
+  console.log("regionid", regionID, "hat soviel Flüge:", flightCount)
+    const ratio = flightCount * multiplicator ;
+    const greenValue = Math.round(ratio * 255);
+    console.log("grüewärt",greenValue, "Max_wert:", maxFlightCount.value)
+    const RGBA_value = `rgba(0, ${greenValue}, 0, 0.5)`
+    return  RGBA_value;
+}
+
 
 const currentZoom = ref(zoom.value);
 const zoomChanged = (newZoom) => {
