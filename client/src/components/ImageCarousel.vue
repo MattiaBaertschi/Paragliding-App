@@ -1,6 +1,6 @@
 <template>
     <carousel :items-to-show="1" :wrap-around="true" class="mb-2">
-      <slide :key="'map'"><MapComponent :flightPath="gnss_records" class="w-full"/></slide>
+      
       <slide v-for="image in images" :key="Slide">
         <img
         :src="`${imageURL}/${image}`"
@@ -8,6 +8,7 @@
         class="w-full h-64 object-contain"
       />
       </slide>
+      <slide :key="'map'"><MapComponent :flightPath="gnss_records" class="w-full"/></slide>
   
       <template #addons>
         <navigation />

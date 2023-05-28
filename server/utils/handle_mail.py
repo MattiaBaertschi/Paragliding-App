@@ -3,14 +3,15 @@ import smtplib, ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from utils.Models import Creds
+from utils.functions import *
+from utils.Models import *
 
 # define function to send an e-mail
 def sendmail(reciver, username, register_token):
 
   msg = MIMEMultipart('alternative')
   msg['Subject'] = "Bestätigung Ihrer Emailadresse"
-  msg['From'] = Creds.MAIL_ADDRESS
+  msg['From'] = MAIL_ADDRESS
   msg['To'] = reciver
   
 
@@ -74,6 +75,6 @@ def sendmail(reciver, username, register_token):
       server.ehlo()
       server.starttls(context=context)
       server.ehlo()
-      server.login(Creds.MAIL_ADDRESS, Creds.MAIL_PASS)
-      server.sendmail(Creds.MAIL_ADDRESS, reciver, msg.as_string())
+      server.login(MAIL_ADDRESS, MAIL_PASS)
+      server.sendmail(MAIL_ADDRESS, reciver, msg.as_string())
       print("Email sent successfully.")

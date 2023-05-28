@@ -12,14 +12,14 @@ var loaded = ref(false)
 
 onMounted(async () => {
   feedData.data = await apiGet('feed', null, token);
-  loaded = true
+  loaded.value = true
 })
 </script>
 
 <template>
   <LoadingComponent v-if="loaded == false" />
   <RouterLink to="upload">
-  <div v-if="feedData.data == null && loaded == true" class="w-full text-xl h-64 bg-white rounded-xl text-center p-8 pt-16 tracking-wider ">
+  <div v-if="feedData.data == '{}' && loaded == true" class="w-full text-xl h-64 bg-white rounded-xl text-center p-8 pt-16 tracking-wider ">
     <p class="margin-auto">Noch keine Flüge vorhanden, beginne mit dem Hochladen eines Fluges…</p>
 
         <div class="p-2 text-center">

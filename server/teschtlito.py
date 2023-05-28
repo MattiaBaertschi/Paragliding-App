@@ -1,65 +1,76 @@
-import utils.Models
+from sqlalchemy import *
+from utils.Models import *
+from sqlalchemy.orm import aliased
 from utils.functions import *
 
-t = (1,2,3,5)
-print(t+(4,))
+engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@localhost/{DB_NAME}", echo=True)
+Base = declarative_base()
 
-# def authenticate_user(username: str, password: str):
-#     user = get_user(username)
-#     if not user:
-#         return False
-#     if not verify_password(password, user.password):
-#         return False
-#     return user
+#=================================== initalize Database ==============================#
+Session = sessionmaker(bind=engine)
+session = Session()
+#=====================================================================================#
 
+print(is_following(4,2))
 
 
 
+# count_followed = session.query(func.count(UserRelation.follower_id)).filter(UserRelation.follower_id == 2).scalar()
 
-# import numpy as np
-# import requests
-
-# a = [[1,2,10],[3,4,20],[5,6,30],[7,8,40],[9,10,50]]
-# reduce_factor = 2
-
-# test = [row[:2] for row in a][::reduce_factor]
-# maching_time = [row[2:3][0] for row in a][::reduce_factor]
+# print("followed")
+# print(count_followed)
 
 
-# red_coord_str = ""
-# for i in test:
-#     red_coord_str = red_coord_str + str(i[1]) + "," + str(i[0]) + ","
+# count_follower = session.query(func.count(UserRelation.followed_id)).filter(UserRelation.followed_id == 2).scalar()
 
+# print("follower")
+# print(count_follower)
 
+# fir = aliased(Flight_in_Region)
 
-# # # define matrix with Data as numpy array
-# # a = np.array(a)
+# # Führe die gewünschte Abfrage aus
+# result = session.query(
+#     fir.region_id,
+#     Flight.user_id,
+#     User.username,
+#     func.count().label('flight_count')
+# ).join(
+#     Flight, Flight.flight_id == fir.flight_id
+# ).join(
+#     User, User.user_id == Flight.user_id
+# ).group_by(
+#     fir.region_id, Flight.user_id, User.username
+# ).subquery()
 
-# # # save all coordinates to array
-# # coord = a[:,:2]
+# subquery = session.query(
+#     result.c.region_id,
+#     result.c.user_id,
+#     result.c.username,
+#     result.c.flight_count,
+#     func.row_number().over(
+#         partition_by=result.c.region_id,
+#         order_by=result.c.flight_count.desc()
+#     ).label('rn')
+# ).subquery()
 
-# # # reduce date by factor {reduce_factor} given with funciton
-# # reduced_data = a[::reduce_factor]
+# final_result = session.query(
+#     subquery.c.region_id,
+#     subquery.c.user_id,
+#     subquery.c.username,
+#     subquery.c.flight_count
+# ).where(subquery.c.rn == 1, subquery.c.user_id.in_([1,2]))
 
-# # # API Request for matching terrain hights
-# # koord_str = ""
-# # for i in reduced_data[:,:2]:
-# #     koord_str = koord_str + str(i[1]) + "," + str(i[0]) + ","
+# json = {}
 
-# api_url = "https://api.airmap.com/elevation/v1/ele?points=" + red_coord_str.rstrip(",")
-# response = requests.get(api_url)
+# # Durchlaufe das Ergebnis
+# for row in final_result:
+#     region_id = row.region_id
+#     user_id = row.user_id
+#     flight_count = row.flight_count
+#     username = row.username
+#     json[region_id] = {"count": flight_count,
+#                         "user_id": user_id,
+#                         "username": username}
+#     # Verarbeite die Daten wie gewünscht
 
-# if response.status_code == 200:
-#     data = np.array(response.json()['data'])
-
-# else:
-#     print("error")
-
-# print(data)
-
-# print(test)
-# print(maching_time)
-
-# result = [sublist + [num] for sublist, num in zip(test, maching_time)]
-
-# print(result)
+# print(json)

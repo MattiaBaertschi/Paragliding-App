@@ -1,5 +1,35 @@
 <script setup>
-import { ref, inject, computed, watch } from 'vue'
+import { ref, inject, computed, watch, onMounted, toRaw } from 'vue'
+import { apiGet } from '@/utils/api';
+import { useSessionStore } from '@/store/user';
+
+const token = useSessionStore().sessionToken;
+
+const data = ref({
+  "523": {
+    "count": 4,
+    "user_id": 7,
+    "username": "cumulus"
+  },
+  "378": {
+    "count": 2,
+    "user_id": 7,
+    "username": "cumulus"
+  },
+  "1521": {
+    "count": 2,
+    "user_id": 7,
+    "username": "cumulus"
+  }
+});
+
+
+onMounted(async () => {
+  data.value = await apiGet('most_flights_per_region', null , token);
+  maxFlightCount.value = Math.max(...Object.values(data.value).map(item => item.count));
+ // console.log("211", maxFlightCount.value)
+  //loaded.value = true
+})
 
   const displayedFlights = ref("me")
   // https://github.com/highcanfly-club/vue-highcanfly/blob/5f757f3a4ccf077bf56a18734ca8cf07bd912e99/src/components/Maps/OLMapSitesDePratique.vue
@@ -10,6 +40,7 @@ import { ref, inject, computed, watch } from 'vue'
   const strokeWidth = ref(2)
   const strokeColor = ref('black')
   const format = inject('ol-format');
+  const maxFlightCount = ref(1)
   
   const flightRegion = [[46.91, 7.45], [46.47, 7.25], [46.74, 8.10]]
   const flightPathWebMecator = computed(() => flight_path.map(toWebMercator));
@@ -31,80 +62,82 @@ import { ref, inject, computed, watch } from 'vue'
   const featureSelected = (event) => {
       if (event.selected.length != 0){
       const SelectedRegion = event.selected[0].values_
-      console.log(SelectedRegion.Name, SelectedRegion.Region, "color:", getColorShade(1,500,SelectedRegion.Region))
-      activeRegion.value = SelectedRegion.Name
+      //console.log(SelectedRegion.Name, SelectedRegion.Region, "color:", getColorShade(1,500,SelectedRegion.Region))
+      activeRegion.value = SelectedRegion.Region
       }
     };
   
-  const activeRegion = ref("Voralpen West")
+  const activeRegion = ref("")
+  const activeRegionData = ref(null)
 
   const selectInteactionFilter = (feature) => {
       return feature.values_.Name != undefined;
     };
 
-    const overrideStyleFunction = (feature, style) => {
-      //console.log(":)", feature.values_.Region)
-      let properties= parseInt(feature.values_.Region)  //from extra data in properties of the feature
-      //console.log(properties)
-      if(properties === 104){ // change the style
-        console.log("JAAAAAAAAAAH")
-        //console.log(style)
-          //style.getFill().setColor("red");
-          style.getFill().setColor(getColorShade(0,400,properties));
-        }
-      else {
-        style.getFill().setColor(getColorShade(0,537,properties));
-      }
-  }
-  
-  const setRegionColor = (flightCount) => {
-    console.log(flightCount)
-    return "yellow"
-  }
+  const overrideStyleFunction = ( feature, style) => {
+    let properties= parseInt(feature.values_.Region)  //from extra data in properties of the feature
+    
+    if (Object.keys(data.value).includes(String(properties))) {
+      //console.log("Super", properties);
+      style.getFill().setColor(calculateColor(properties));
+    }
+
+    else {
+      style.getFill().setColor("rgba(50, 50, 50, 0.1)");
+    }
+}
+
 
   watch(activeRegion, (newValue, oldValue) => {
-    console.log("bliblablub",newValue)
-    
-  })
+    //console.log("Selected Region:" ,newValue)
+    try {
+      activeRegionData.value = toRaw(data.value[newValue]);
+      //console.log("scheisse",activeRegionData.value)
+    }
+    catch {
+      //console.log(error)
+    }
+  }
+  )
 
 defineProps({
   msg: String,
 })
-//https://xctherm.com/data/regions.json
 
-
-function getColorShade(minValue, maxValue, value) {  
-  const colorRange = 255;
-  const index = Math.round((value - minValue) / (maxValue - minValue) * colorRange);
-  const red = 0
-  const green = Math.round(155 * (index / colorRange) + 100)
-  const blue = 0;
-
-  //if (value != 0){
-  if (value != 103 && value !=102){
-    return `rgba(${red}, ${green}, ${blue}, 0.5)`;
-  }
-  else {
-    return `rgba(125, 125, 125, 0.5)`;
-  }
+function getCountById(id) {
+    return data.value[id] ? data.value[id].count : 0;
 }
 
-console.log(getColorShade(1,500,499))
+function calculateColor(regionID) {
+  const multiplicator = 1 / maxFlightCount.value
+  const flightCount = getCountById(regionID)
+  console.log("regionid", regionID, "hat soviel Flüge:", flightCount)
+    const ratio = flightCount * multiplicator ;
+    const greenValue = Math.round(ratio * 255);
+    console.log("grüewärt",greenValue, "Max_wert:", maxFlightCount.value)
+    const RGBA_value = `rgba(0, ${greenValue}, 0, 0.5)`
+    return  RGBA_value;
+}
+
 
 const currentZoom = ref(zoom.value);
 const zoomChanged = (newZoom) => {
     currentZoom.value = newZoom;
   };
 
-
 </script>
 
 <template>
 <div>
   <div class="fixed bottom-14 z-10 left-0 right-0 bg-white px-4 py-4 flex center">
-  <p><strong>Region:</strong> {{ activeRegion }}</p>
-  <div>
- zoom : {{ currentZoom }} 
+  <p class="mr-2 font-semibold">#{{ activeRegion }}</p>
+  <div v-if="activeRegionData != null" >
+    Der User {{ activeRegionData.username }} ist 
+    {{ activeRegionData.count }}x in dieser Region geflogen.
+    <RouterLink :to="`buddy/${ activeRegionData.user_id }`">Profil ansehen</RouterLink>
+  </div>
+  <div v-if="activeRegionData == undefined">
+    <p>Noch keine Flüge in dieser Region</p>
   </div>
 </div>
 
@@ -124,11 +157,6 @@ const zoomChanged = (newZoom) => {
     />
     <ol-zoom-control/>
     <ol-fullscreen-control/>
-
-    <!-- <ol-tile-layer>
-      <ol-source-osm />
-  </ol-tile-layer> -->
-
     <ol-tile-layer>
       <ol-source-xyz url="http://{1-4}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png" />
       <!-- <ol-source-xyz url="https://stamen-tiles-c.a.ssl.fastly.net/terrain/{z}/{x}/{y}@2x.png" />  -->
@@ -142,29 +170,23 @@ const zoomChanged = (newZoom) => {
     >
       <ol-style>
         <ol-style-stroke color="black" :width="1"></ol-style-stroke>
-        <ol-style-fill color="rgba(255,255,255,1)"></ol-style-fill>
+        <!-- <ol-style-fill color="rgba(255,255,255,1)"></ol-style-fill> -->
         <!--<ol-style-icon :src="markerIcon" :scale="0.05"></ol-style-icon>-->
       </ol-style>
     </ol-interaction-select>
 
     <ol-vector-layer>
-      <!-- <ol-source-vector
-        ref="cities"
-        url="http://localhost:5173/src/data/regions.json"
-        :format="geoJson"
-        :projection="projection"
-      /> -->
       <ol-source-vector
         v-if="currentZoom > 7"
         ref="cities"
-        url="http://localhost:5173/src/data/hexagon_swiss_12km_wgs84_reform.geojson"
+        url="http://localhost:5173/src/data/hexagon_swiss_10km_wgs84_reform.geojson"
         :format="geoJson"
         :projection="projection"
       />
 
       <ol-style :overrideStyleFunction="overrideStyleFunction">
-        <ol-style-stroke color="black" :width="1"></ol-style-stroke>
-        <ol-style-fill color="rgba(255,255,0,0.5)"></ol-style-fill>
+        <ol-style-stroke color="black" :width="0.2"></ol-style-stroke>
+        <ol-style-fill color="rgba(255,255,0,0.1)"></ol-style-fill>
         <ol-style-circle :radius="7">
           <ol-style-fill color="blue"></ol-style-fill>
         </ol-style-circle>

@@ -10,6 +10,7 @@ export const useSessionStore = defineStore({
     state: () => ({
       sessionToken: null,
       username: null,
+      userId: null,
     }),
     
     actions: {
@@ -26,8 +27,10 @@ export const useSessionStore = defineStore({
                     'Content-Type': 'application/x-www-form-urlencoded'
                   }
                 })
+                console.log("Hèèèèèèèèèèèèèèèèèèèèèèèè:", response.user_id)
       
               this.sessionToken = response.data.access_token;
+              this.userId = response.data.user_id
               this.username = username
 
             } 
@@ -65,6 +68,7 @@ export const useSessionStore = defineStore({
         logout() {
               this.sessionToken = null;
               this.username = null;
+              this.userId = null;
             },
 
 },
