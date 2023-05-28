@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="flex flex-col items-center">
-    <img src="https://www.shutterstock.com/image-vector/cheerful-gray-cat-enjoys-paragliding-260nw-1981432805.jpg" alt="Profilbild" class="w-32 h-32 rounded-full mb-4">
+    <img :src="profileImage" alt="Profilbild" class="w-32 h-32 rounded-full mb-4">
 
     <h2 class="text-xl mb-2 font-bold text-gray-800">{{ userdata.firstname }} {{ userdata.lastname }}</h2>
     <p>@{{ userdata.username }}</p>
@@ -41,7 +41,9 @@ import { useSessionStore } from '@/store/user';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { apiGet, apiPost } from '@/utils/api';
-import FlightCard from "@/components/FlightCard.vue"
+import FlightCard from "@/components/FlightCard.vue";
+  import profileSVG from '@/assets/user.svg';
+
 const token = useSessionStore().sessionToken;
 
 const route = useRoute(); 
@@ -50,6 +52,8 @@ const loaded = ref(false)
 const isUpdating = ref(false);
 const data = ref(null);
 const userId = route.params.id;
+const profileImage = ref(profileSVG)
+ const imageURL = "https://hoemknoebi.internet-box.ch/images/profile_pictures"
 
 const userdata = ref({
   "user_id": 1,
@@ -73,6 +77,9 @@ async function fetchData() {
   }
   try {
     userdata.value = await apiGet('userprofile_other_user', requestID , token);
+    if (userdata.value.profile_picture != null){
+      profileImage.value = imageURL + "/" + userdata.value.profile_picture
+    }
     data.value = await apiGet('display_flights_of_followed', requestIDforFlight , token);
   }
   catch {

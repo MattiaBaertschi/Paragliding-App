@@ -13,6 +13,7 @@ import EditFlight from "@/views/EditFlight.vue"
 import ViewBuddy from "@/views/ViewBuddy.vue"
 import ViewBuddyFlight from "@/views/ViewBuddyFlight.vue"
 import BuddyOverview from "@/views/BuddyOverview.vue"
+import EditProfile from "@/views/EditProfile.vue"
 
 const routes = [
     {
@@ -77,13 +78,18 @@ const routes = [
     },
     {
         path: "/register",
-        name: "Registrieren",
+        name: "registrieren",
         component: RegisterForm
     },
     {
         path: "/buddy/:id",
         name: "viewbuddy",
         component: ViewBuddy
+    },
+    {
+        path: "/user/edit",
+        name: "edituser",
+        component: EditProfile
     }
 ]
 
