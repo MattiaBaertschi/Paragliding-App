@@ -1,5 +1,4 @@
 <template>
-  <div>
     <div class="mb-4 bg-white p-4 text-lg rounded-xl">Suche nach <select v-model="searchType">
         <option value="all">Flügen & Buddys</option>
         <option value="flights">Flügen</option>
@@ -20,30 +19,31 @@
     </div>
 
     <input type="text" v-model="searchQuery" class="w-full border-2 rounded-full p-2 mb-4" placeholder="Suchbegriff" />
-    
-    <div v-if="searchType === 'all' || searchType === 'flights'">
-      <h3 class="text-base font-bold uppercase tracking-widest mt-8 text-black">Flüge:</h3>
-      <ul>
-        <li v-for="flight in filteredFlights" :key="flight.flight_id">
-          <div @click="handleFlightSelection(flight.flight_id, flight.user_id)" class="cursor-pointer">
-          <FlightCard :flight="flight" />
-        </div>
-        </li>
-      </ul>
-    </div>
+    <LoadingComponent v-if="loading == true" />
+    <div v-if="loading == false">
+      <div v-if="searchType === 'all' || searchType === 'flights'">
+        <h3 class="text-base font-bold uppercase tracking-widest mt-8 text-black">Flüge:</h3>
+        <ul>
+          <li v-for="flight in filteredFlights" :key="flight.flight_id">
+            <div @click="handleFlightSelection(flight.flight_id, flight.user_id)" class="cursor-pointer">
+            <FlightCard :flight="flight" />
+          </div>
+          </li>
+        </ul>
+      </div>
 
-    <div v-if="searchType === 'all' || searchType === 'users'">
-      <h3 class="text-base font-bold uppercase tracking-widest mt-8 text-black">Buddys:</h3>
-      <ul>
-        <li v-for="user in filteredUsers" :key="user.user_id">
-          <RouterLink :to="`buddy/${ user.user_id }`">
-            <UserCard :user="user" />
-        </RouterLink>
-        </li>
-      </ul>
-    </div>
-
+      <div v-if="searchType === 'all' || searchType === 'users'">
+        <h3 class="text-base font-bold uppercase tracking-widest mt-8 text-black">Buddys:</h3>
+        <ul>
+          <li v-for="user in filteredUsers" :key="user.user_id">
+            <RouterLink :to="`buddy/${ user.user_id }`">
+              <UserCard :user="user" />
+          </RouterLink>
+          </li>
+        </ul>
+      </div>
   </div>
+
 </template>
 
 <script setup>
@@ -53,10 +53,12 @@ import UserCard from "@/components/UserCard.vue"
 import { apiGet } from '@/utils/api';
 import { useSessionStore } from '@/store/user';
 import { useRouter } from 'vue-router';
+import LoadingComponent from '@/components/LoadingComponent.vue';
 const sessionStore = useSessionStore()
 const userId = sessionStore.userId
 const router = useRouter();
 const token = sessionStore.sessionToken;
+
 
 const loading = ref(true);
 var flights = reactive({});

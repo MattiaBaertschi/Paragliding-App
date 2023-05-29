@@ -97,6 +97,7 @@ async function sendFollowRequest() {
   };
   try {
     const response = await apiPost('follow_request', requestIDforFollow, token);
+    console.log(response)
   }
   catch(error) {
     console.log(error);

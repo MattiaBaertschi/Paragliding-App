@@ -32,6 +32,7 @@ export const useSessionStore = defineStore({
               this.sessionToken = response.data.access_token;
               this.userId = response.data.user_id
               this.username = username
+              return response.data
 
             } 
             catch (error) {
@@ -42,7 +43,6 @@ export const useSessionStore = defineStore({
         },
 
         async register(username, email, password, firstname, lastname, shv_nr) {
-          try {  
             const requestData = {
               username: username,
               e_mail: email,
@@ -57,12 +57,7 @@ export const useSessionStore = defineStore({
               params: requestData
             });
             
-            console.log("Registrierung erfolgreich", register_response);
-          }
-          catch(error) {
-            console.log(error);
-            throw error;
-          }
+            return register_response.data
         },
            
         logout() {

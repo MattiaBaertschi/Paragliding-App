@@ -8,7 +8,7 @@ import LoadingComponent from '@/components/LoadingComponent.vue';
 const token = useSessionStore().sessionToken;
 
 const feedData = reactive({ data: [] })
-var loaded = ref(false)
+const loaded = ref(false)
 
 onMounted(async () => {
   feedData.data = await apiGet('feed', null, token);

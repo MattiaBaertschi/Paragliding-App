@@ -1,5 +1,5 @@
 <template>
-    <div :class="['p-2 mb-4 tracking-wider rounded text-center', colorClass, { 'cursor-not-allowed': disabled }, { 'opacity-50': disabled }]" @click="handleClick">
+    <div :class="['p-2 my-2 tracking-wider rounded text-center', colorClass, { 'cursor-not-allowed': disabled }, { 'opacity-50': disabled }]" @click="handleClick">
       <RouterLink v-if="isRouterLink" :to="link" class="w-full text-center flex justify-center items-center">
         <img v-if="icon" :src="icon" class="h-6 w-6 mr-2" alt="Icon" />
         <a>{{ buttonText }}</a>
@@ -35,7 +35,7 @@
   }
   
   const colorClass = computed(() => {
-    return props.color === 'schwarz' ? 'bg-black text-white hover:bg-white hover:text-black' : 'bg-white text-center hover:bg-black hover:text-white'
+    return props.color === 'schwarz' ? 'bg-black text-white hover:bg-dark' : 'bg-white text-center hover:bg-whitehover'
   })
   </script>
   

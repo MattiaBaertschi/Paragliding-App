@@ -17,6 +17,7 @@ import glider from '@/assets/glider.svg';
 import { apiGet, apiPost } from '@/utils/api';
 import { useSessionStore } from '@/store/user';
 import { useRouter } from 'vue-router';
+import LoadingComponent from '@/components/LoadingComponent.vue';
 
 const token = useSessionStore().sessionToken;
 
@@ -70,6 +71,7 @@ const deleteFlight = async () => {
 
 <template>
 <div>
+  <LoadingComponent v-if="loaded == false" />
     <div v-if="loaded == false" class="h-full w-full bg-red-700"></div>
     <span class="hidden">{{ currentFlight.data }}</span>
     <div v-if="loaded == true">
