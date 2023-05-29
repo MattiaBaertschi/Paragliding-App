@@ -1,6 +1,6 @@
 <template>
 <div>
-        <div class="flex items-center justify-between mt-8">
+        <div class="flex items-center justify-between">
             <div class="flex flex-col">
                 <button @click="setChartTimeFrame('all'); updateKey += 1" class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-primary text-white': chartTimeFrame === 'all'}">Alle</button>
                 <button @click="setChartTimeFrame('year'); updateKey += 1"  class="text-xs tracking-wider mr-2 px-4 py-2 my-1 bg-light rounded-full" :class="{ 'bg-primary text-white': chartTimeFrame === 'year'}">Jahr</button>
@@ -67,7 +67,7 @@ const timePerFlightStats = {
     {
       data: [1.3, 2.5, 1.1, 0.3, 1.8],
       label: "⌀ Flugzeit per Flug",
-      backgroundColor: "#B76126",
+      backgroundColor: "#000000",
     },
   ],
 };
@@ -76,12 +76,12 @@ const chartData = {
     labels: filterDataLabel(dataLabel, "all"),
     datasets: [{
     data: data1,
-    label: 'Flughöhe',
-    backgroundColor: "#B76126"
+    label: 'Flüge',
+    backgroundColor: "#aaaaaa"
     },
     {data: data2,
     label: 'Höhe über Grund',
-    backgroundColor: '#29344B'
+    backgroundColor: '#000000'
     }
   ]};
 

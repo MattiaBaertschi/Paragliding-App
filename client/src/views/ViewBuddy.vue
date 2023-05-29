@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="flex flex-col items-center">
-    <img :src="profileImage" alt="Profilbild" class="w-32 h-32 rounded-full mb-4">
+    <img :src="profileImage" alt="Profilbild" class="w-32 h-32 rounded-full mb-4 object-cover">
 
     <h2 class="text-xl mb-2 font-bold text-gray-800">{{ userdata.firstname }} {{ userdata.lastname }}</h2>
     <p>@{{ userdata.username }}</p>

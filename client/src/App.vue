@@ -33,17 +33,21 @@
   watch(() => route.path, (newPath, oldPath) => {
     console.log(`Die Route hat sich von ${oldPath} zu ${newPath} geändert`);
     // Hier können Sie eine Funktion ausführen, wenn die Route geändert wird
-    if (newPath === '/login' || newPath === '/register') {
-      console.log("jahmann")
+    if (newPath === '/login') {
+
       showHeaderAndNav.value = false;
+    }
+    else if (newPath === '/register') {
+
+      showHeaderAndNav.value = false;
+    }
+    else {
+      showHeaderAndNav.value = true;
     }
 
     if (sessionStore.username == null && newPath != "/register" ){
     //Auskommentieren damit Login Seite kommt wenn keine Benutzer angemeldet ist.
     //router.push('/login');
-    }
-    else {
-      showHeaderAndNav.value = true;
     }
   });
 </script>
