@@ -201,7 +201,7 @@ const zoomChanged = (newZoom) => {
       <ol-source-vector
         v-if="currentZoom > 7"
         ref="flightregion"
-        url="/src/data/hexagon_swiss_10km_wgs84_reform.geojson"
+        url="/hexagon_swiss_10km_wgs84_reform.geojson"
         :format="geoJson"
         :projection="projection"
         :key="displayedFlights"
