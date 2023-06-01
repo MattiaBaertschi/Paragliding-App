@@ -24,27 +24,33 @@ app.add_middleware(
 templates = Jinja2Templates(directory='./templates')
 
 
-
 #================================================= Registration and Verifycation ==================================================#
 
 
 # --- Registration --- #
 
 @app.post('/api/register')
-async def register(username:str, e_mail:str, firstname:str, lastname:str, password: str, shv_nr:int = None):
+async def register(username:str = Query(..., encoding="utf-8"),
+                   e_mail:str = Query(..., encoding="utf-8"),
+                   firstname:str = Query(..., encoding="utf-8"),
+                   lastname:str = Query(..., encoding="utf-8"),
+                   password: str = Query(..., encoding="utf-8"),
+                   shv_nr:int = None):
     try:
         # Validiere die Eingabe
-        if not is_valid_input(username, e_mail, firstname, lastname, password, shv_nr):
+        # if not is_valid_input(username, e_mail, firstname, lastname, password, shv_nr):
+        #     raise HTTPException(status_code=400, detail='Ungültige Eingabe')
+        try:
+            # Versuche, den neuen Benutzer zur Datenbank hinzuzufügen
+            new_user = User(username=username,
+                            e_mail=e_mail, firstname=firstname,
+                            lastname=lastname,
+                            password=password,
+                            shv_nr=shv_nr,
+                            verifyed=False,
+                            disabled=False)
+        except:
             raise HTTPException(status_code=400, detail='Ungültige Eingabe')
-
-        # Versuche, den neuen Benutzer zur Datenbank hinzuzufügen
-        new_user = User(username=username,
-                        e_mail=e_mail, firstname=firstname,
-                        lastname=lastname,
-                        password=password,
-                        shv_nr=shv_nr,
-                        verifyed=False,
-                        disabled=False)
         session.add(new_user)
         session.commit()
 

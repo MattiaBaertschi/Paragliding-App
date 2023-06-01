@@ -1,6 +1,6 @@
 # Paragliding APP
 
-Server Client Projekt im Rahmen des Vertiefunsprofiles Geoinformatik und Datenanalyse (Modul 4230) des Institustes Geomatik an der FHNW Muttenz. 
+Server Client Projekt im Rahmen des Vertiefunsprofiles Geoinformatik und Raumanalyse (Modul 4230) des Institutes Geomatik an der FHNW Muttenz. 
 
 - **Frontend:** VUE.js, OpenLayers und Tailwind
 - **Backend:** FastAPI, PostgreSQL
@@ -37,8 +37,8 @@ npm run dev
 cd server
 # Füge conda-forge den als Channel in conda hinzu, da sonst nicht alle Pakete installiert werden können.
 conda config --add channels conda-forge
-# Erstelle ein neues Conda Environment und füge die Python Packges requirements.txt hinzu, requirements.txt befindet sich im Ordner server/app
-conda create --name cloudy python=3.10.9 --file app/requirements.txt
+# Erstelle ein neues Conda Environment und füge die Python Packges requirements.txt hinzu, requirements.txt befindet sich im Ordner server
+conda create --name cloudy python=3.10.9 --file requirements.txt
 ```
 3. Aufsetzen einer loklaen PostgreSQL Datenbank
    Besuche die offizielle PostgreSQL-Website unter https://www.postgresql.org/ und lade dir die Version PostgreSQL 15 herunter.
@@ -62,7 +62,7 @@ uvicorn app.main:app --reload
 ```
 
 ## API Dokumentation
-Fast API kommt mit vorinstallierter Swagger UI. Wenn der Fast API Backen Server läuft, kann auf die Dokumentation der API über Swagger UI auf http://localhost:8000/api/docs verfügbar.
+Fast API kommt mit vorinstallierter Swagger UI. Wenn der Fast API Backend Server läuft, ist die Dokumentation der API über Swagger UI auf http://localhost:8000/api/docs verfügbar.
 
 ***Achtung:***
 
