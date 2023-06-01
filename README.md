@@ -62,7 +62,7 @@ uvicorn app.main:app --reload
 ```
 
 ## API Dokumentation
-Fast API kommt mit vorinstallierter Swagger UI. Wenn der Fast API Backen Server läuft, kann auf die Dokumentation der API über Swagger UI auf http://localhost:8000/api/docs verfügbar.
+Fast API kommt mit vorinstallierter Swagger UI. Wenn der Fast API Backend Server läuft, ist die Dokumentation der API über Swagger UI auf http://localhost:8000/api/docs verfügbar.
 
 ***Achtung:***
 
