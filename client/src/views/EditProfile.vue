@@ -107,7 +107,6 @@
 
   const onDrop = (event) => {
     image.value = event.dataTransfer.files[0];
-    console.log("DROPPE LIKE ITS HOT", image.value)
   };
   
   const submitImage = async () => {
@@ -128,7 +127,6 @@
   };
 
   const removeImage = async () => {
-    console.log("WEG DAMIT")
     isUpdating.value = true
     await apiPost('delete_profile_picture', null, token, null);
     fetchData()

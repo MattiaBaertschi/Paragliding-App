@@ -85,7 +85,6 @@ async function updateFlight() {
   };
   try {
     const response = await apiPost('edit_flight', flightData, token);
-    console.log("Daten erfolgreich aktualisiert", response);
   } 
   catch(error) {
     console.log(error);
@@ -109,9 +108,7 @@ const selectImage = (image) => {
 async function deleteImages () {
   if(selectedImages.value.length > 0){
     isUpdating.value = true;
-    console.log("bilder zum löschen", selectedImages.value)
     const postData = toRaw(selectedImages.value)
-    console.log("bilder zum löschen:", postData)
     try {
       const response = await apiPost("delete_flight_image", flightData , token, postData)
       console.log(response)

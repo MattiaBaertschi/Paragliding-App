@@ -38,7 +38,6 @@ onMounted(async () => {
   dataRegionUser.value = await apiGet('flight_in_region', null , token);
   data.value = dataRegionBuddys.value
   maxFlightCount.value = Math.max(...Object.values(data.value).map(item => item.count));
-  console.log("211", maxFlightCount.value)
   //loaded.value = true
 })
 
@@ -59,12 +58,10 @@ onMounted(async () => {
 
   function handledisplayedFlights(selection){
     if (selection == "me"){
-      console.log("MEEEEEEEEEEEE")
       displayedFlights.value = 'me'
       data.value = dataRegionUser.value
     }
     else {
-      console.log("BUDDDYS")
       displayedFlights.value = 'buddys'
       data.value = dataRegionBuddys.value
     }
@@ -85,7 +82,6 @@ onMounted(async () => {
   const featureSelected = (event) => {
       if (event.selected.length != 0){
       const SelectedRegion = event.selected[0].values_
-      //console.log(SelectedRegion.Name, SelectedRegion.Region, "color:", getColorShade(1,500,SelectedRegion.Region))
       activeRegion.value = SelectedRegion.Region
       }
     };
@@ -101,7 +97,6 @@ onMounted(async () => {
     let properties= parseInt(feature.values_.Region)  //from extra data in properties of the feature
     
     if (Object.keys(data.value).includes(String(properties))) {
-      //console.log("Super", properties);
       style.getFill().setColor(calculateColor(properties));
     }
 
@@ -112,13 +107,11 @@ onMounted(async () => {
 
 
   watch(activeRegion, (newValue, oldValue) => {
-    //console.log("Selected Region:" ,newValue)
     try {
       activeRegionData.value = toRaw(data.value[newValue]);
-      //console.log("scheisse",activeRegionData.value)
     }
     catch {
-      //console.log(error)
+      null
     }
   }
   )

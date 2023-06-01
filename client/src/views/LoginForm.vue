@@ -42,14 +42,12 @@
     try {
       await sessionStore.login(username.value, password.value);
       if (sessionStore.username != null){
-        console.log('Login erfolgreich', username.value);
         router.push('/home');
       }
     } catch (error) {
       console.error('Login fehlgeschlagen', error);
       loginError.value = true;
       errorMessage.value = 'Anmeldung fehlgeschlagen.';
-      console.log(username.value, password.value)
       imageSrc = image_login_failed
     }
   }

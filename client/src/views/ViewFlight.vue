@@ -52,7 +52,6 @@ function toggleMap() {
 
 const deleteFlight = async () => {
   isUpdating.value = true
-  console.log("Flug löschen")
   const flightData = {flight_id: id};
   try {
     await apiPost('delete_flight', flightData, token, null);

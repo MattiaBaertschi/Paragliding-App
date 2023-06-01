@@ -28,10 +28,8 @@
   const sessionStore = useSessionStore();
   const showHeaderAndNav = ref(true);
 
-  
-
   watch(() => route.path, (newPath, oldPath) => {
-    console.log(`Die Route hat sich von ${oldPath} zu ${newPath} geändert`);
+    // console.log(`Die Route hat sich von ${oldPath} zu ${newPath} geändert`);
     // Hier können Sie eine Funktion ausführen, wenn die Route geändert wird
     if (newPath === '/login') {
 
@@ -47,7 +45,7 @@
 
     if (sessionStore.username == null && newPath != "/register" ){
     //Auskommentieren damit Login Seite kommt wenn keine Benutzer angemeldet ist.
-    //router.push('/login');
+    router.push('/login');
     }
   });
 </script>

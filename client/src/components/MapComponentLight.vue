@@ -69,10 +69,8 @@ const calcMapCenter = (coordinates) => {
 
   const avgLongitude = Math.round(sumLongitudes / coordinates.length);
   const avgLatitude = Math.round(sumLatitudes / coordinates.length);
-  console.log(avgLatitude)
 
   const mapCenter = [avgLongitude,avgLatitude]
-  console.log(mapCenter)
 
   return mapCenter
 }
@@ -94,7 +92,6 @@ const calcGeomExtent = (geometry) => {
     parseFloat(max_long.toFixed(14))+(max_long-min_long)*0.1,
     parseFloat(max_lat.toFixed(14))+(max_lat-min_lat)*0.1,
   ];
-  console.log("mapExtent:", result);
   return(result)
 }
 

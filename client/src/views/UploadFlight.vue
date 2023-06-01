@@ -47,7 +47,6 @@ const addFile = () => {
   fileInput.multiple = false;
   fileInput.click();
   if (fileInput == null){
-    console.log("File geladen")
     fileLoaded.value = true
   }
   else {
@@ -58,7 +57,6 @@ const addFile = () => {
 
 const handleFileUpload = () => {
   file.value = fileRef.value.files[0];
-  console.log(file.value);
 };
 
 const removeFile = () => {
@@ -83,14 +81,11 @@ const submitFile = async () => {
       }
     });
     errorActive.value = false    
-    console.log('SUCCESS!!', response.data);
     router.push(`/flights/edit/${response.data}`)
     
     } 
   catch (error) {
-      console.log('FAILURE!!', error);
       errorActive.value = true
-      console.log("errorvalue", errorActive.value)
     }
   finally {
     isUpdating.value = false
