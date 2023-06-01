@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker, query, aliased
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.dialects.postgresql import JSON
 
-from fastapi import Depends, FastAPI, File, UploadFile, Form, HTTPException, status, Request
+from fastapi import Depends, FastAPI, File, UploadFile, Form, HTTPException, status, Request, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -230,6 +230,7 @@ def get_flights_for_feed(user_id, amount):
     for flight, user in flights:
         flight_dict = {
             "flight_id": flight.flight_id,
+            "flight_name":flight.flight_name,
             "upload_date": flight.upload_date,
             "user_id": flight.user_id,
             "username": user.username,
@@ -289,7 +290,7 @@ def get_flights_per_region_for_user(user_id):
 
     result = session.query(
         fir.region_id,
-        func.count().label('flight_count')
+        func.count().label('count')
     ).join(
         Flight, Flight.flight_id == fir.flight_id
     ).filter(
@@ -298,16 +299,15 @@ def get_flights_per_region_for_user(user_id):
         fir.region_id
     ).all()
 
-    regions = []
+    json = {}
+
+    # transform query result to json
     for row in result:
         region_id = row.region_id
-        flight_count = row.flight_count
-        regions.append({
-            "region_id": region_id,
-            "flight_count": flight_count
-        })
-
-    return regions
+        count = row.count
+        json[region_id] = {"count": count
+        }
+    return json
 
 def get_most_flights_per_region(buddys_and_me):
     fir = aliased(Flight_in_Region)
