@@ -37,7 +37,7 @@ npm run dev
 cd server
 # Füge conda-forge den als Channel in conda hinzu, da sonst nicht alle Pakete installiert werden können.
 conda config --add channels conda-forge
-# Erstelle ein neues Conda Environment und füge die Python Packges requirements.txt hinzu, requirements.txt befindet sich im Ordner server/app
+# Erstelle ein neues Conda Environment und füge die Python Packges requirements.txt hinzu, requirements.txt befindet sich im Ordner server
 conda create --name cloudy python=3.10.9 --file app/requirements.txt
 ```
 3. Aufsetzen einer loklaen PostgreSQL Datenbank
