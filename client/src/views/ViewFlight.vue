@@ -5,6 +5,7 @@ import LineChart from "@/components/LineChart.vue";
 import MapComponent from "@/components/MapComponent.vue";
 import ImageCarousel from "@/components/ImageCarousel.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
 import takeoff from '@/assets/takeoff.svg';
 import landing from '@/assets/landing.svg';
 import date from '@/assets/date.svg';
@@ -12,9 +13,11 @@ import remove from '@/assets/remove.svg';
 import edit from '@/assets/edit.svg';
 import stopwatch from '@/assets/stopwatch.svg';
 import user from '@/assets/user.svg';
+import glider from '@/assets/glider.svg';
 import { apiGet, apiPost } from '@/utils/api';
 import { useSessionStore } from '@/store/user';
 import { useRouter } from 'vue-router';
+import LoadingComponent from '@/components/LoadingComponent.vue';
 
 const token = useSessionStore().sessionToken;
 
@@ -68,6 +71,7 @@ const deleteFlight = async () => {
 
 <template>
 <div>
+  <LoadingComponent v-if="loaded == false" />
     <div v-if="loaded == false" class="h-full w-full bg-red-700"></div>
     <span class="hidden">{{ currentFlight.data }}</span>
     <div v-if="loaded == true">
@@ -92,19 +96,22 @@ const deleteFlight = async () => {
           <img :src="date" alt="Cloudys" class="w-6 h-6 mr-2">
           <div class="text-xl">{{ currentFlight.data.date }}</div>
         </div>
-        <div class="flex">
+        <div class="flex mb-4">
         <img :src="stopwatch" alt="Cloudys" class="w-6 h-6 mr-2">
         <div class="text-xl">{{ currentFlight.data.duration }}</div>
+        </div>
+        <div class="flex mb-4">
+        <img :src="glider" alt="Cloudys" class="w-6 h-6 mr-2">
+        <div class="text-xl">{{ currentFlight.data.glider }}</div>
         </div>
       </div>
       <div v-show="currentFlight.data.comment != null" class="bg-white p-4 rounded-xl my-4">
         <p class="font-semibold text-sm tracking-wider">Kommentar</p>
         <p>{{ currentFlight.data.comment }}</p>
       </div>
-      <div class="mb-4">
-        <RouterLink :to="`edit/${ currentFlight.data.id }`"></RouterLink>
-        <ButtonComponent text="Flug bearbeiten" :path="`../edit/${ id }`" :icon="edit" />
-      <ButtonComponent text="Löschen" @click="deleteFlight" path="" :icon="remove" />
+      <div>
+        <PrimaryButton buttonText="Flug bearbeiten" :link="`../edit/${ id }`" :isRouterLink="true" :icon="edit"/>
+        <PrimaryButton buttonText="Flug löschen" :icon="remove" :action="deleteFlight"/>
       </div>
     </div>
 
